@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>ARO Komunikátor</title>
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
@@ -31,7 +33,7 @@
   --redl:#2C0D0D;--ambl:#2A1A05;--blul:#0A1E30;--purl:#1A1840;
   --sh:0 2px 12px rgba(0,0,0,.25);--shl:0 8px 32px rgba(0,0,0,.4);
 }
-html,body{height:100%;width:100%;margin:0;padding:0;font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--tx);transition:background .25s,color .25s;overflow:hidden}
+html,body{height:100%;width:100%;margin:0;padding:0;font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--tx);transition:background .25s,color .25s}
 button{cursor:pointer;font-family:"DM Sans",sans-serif;border:none;background:none;color:inherit}
 input,select{font-family:"DM Sans",sans-serif;color:var(--tx)}
 #app{display:flex;flex-direction:column;height:100vh;width:100%;background:var(--bg);transition:background .25s}
@@ -69,23 +71,27 @@ input,select{font-family:"DM Sans",sans-serif;color:var(--tx)}
 .icard-ck{position:absolute;top:5px;right:5px;width:16px;height:16px;background:var(--tl);border-radius:50%;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .12s}
 .icard.sel .icard-ck{opacity:1}
 /* QUEUE */
-.qpanel{padding:10px 14px;background:var(--bg);border-top:1px solid var(--br);flex-shrink:0}
+.qpanel{padding:10px 14px 12px;background:var(--bg);border-top:1px solid var(--br);flex-shrink:0}
 .qtop{display:flex;align-items:center;gap:7px;margin-bottom:8px}
 .qlbl{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em}
 .qbadge{background:var(--tl);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px}
-.qscroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:5px;min-height:52px;align-items:center}
-.qscroll::-webkit-scrollbar{height:3px}
+.qscroll{display:flex;flex-direction:row;gap:8px;overflow-x:auto;padding-bottom:6px;min-height:100px;align-items:stretch}
+.qscroll::-webkit-scrollbar{height:4px}
 .qscroll::-webkit-scrollbar-thumb{background:var(--tll);border-radius:2px}
 .qempty{font-size:12px;color:var(--tx3);font-style:italic}
 
-.qi{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--bg2);border:1px solid var(--br);border-radius:8px;padding:8px 10px;min-width:80px;max-width:100px;flex-shrink:0;position:relative;cursor:grab;touch-action:none;transition:opacity .15s,box-shadow .15s}
-.qi.dragging{opacity:.45;cursor:grabbing;box-shadow:0 6px 18px rgba(0,0,0,.18)}
-.qi.drag-over{border-color:var(--tl);box-shadow:0 0 0 2px rgba(29,158,117,.3)}
-.qi-pos{position:absolute;top:-5px;left:-5px;width:14px;height:14px;background:var(--tl);color:#fff;border-radius:50%;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center}
-.qi-ic{font-size:22px}
-.qi-tx{font-size:11px;font-weight:500;color:var(--tx);text-align:center;line-height:1.3;max-width:86px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.qi-rm{position:absolute;top:-5px;right:-5px;width:14px;height:14px;background:var(--red);color:#fff;border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .12s;cursor:pointer;border:none}
+.qi{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:var(--bg2);border:1.5px solid var(--br);border-radius:12px;padding:10px 8px;width:88px;min-width:88px;height:88px;flex-shrink:0;position:relative;cursor:grab;touch-action:none;transition:all .15s;text-align:center}
+.qi.dragging{opacity:.3;cursor:grabbing;transform:scale(.92);filter:brightness(.9)}
+.qi-sep{width:4px;min-width:4px;height:88px;border-radius:2px;background:transparent;flex-shrink:0;transition:all .15s;position:relative;align-self:center}
+.qi-sep.active{width:28px;min-width:28px;background:var(--tl);box-shadow:0 0 0 3px rgba(29,158,117,.2)}
+.qi-sep.active::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:10px;height:10px;background:#fff;border:2px solid var(--tl);border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.qi-drag-handle{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--tx3);letter-spacing:1px;line-height:1;user-select:none;cursor:grab}
+.qi-pos{position:absolute;top:-7px;left:-7px;width:20px;height:20px;background:var(--tl);color:#fff;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.qi-ic{font-size:28px;line-height:1}
+.qi-tx{font-size:11px;font-weight:500;color:var(--tx);line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;width:100%}
+.qi-rm{position:absolute;top:-7px;right:-7px;width:18px;height:18px;background:var(--red);color:#fff;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;opacity:0;transition:opacity .15s}
 .qi:hover .qi-rm{opacity:1}
+
 .qacts{display:flex;gap:7px;margin-top:8px}
 .clrbtn{padding:9px 14px;border-radius:8px;font-size:13px;color:var(--tx2);border:1px solid var(--br);transition:all .12s}
 .clrbtn:hover{background:var(--redl);border-color:var(--red);color:var(--red)}
@@ -203,7 +209,7 @@ input,select{font-family:"DM Sans",sans-serif;color:var(--tx)}
 
 /* dual language labels */
 .icard-staff{font-size:11px;color:var(--tx3);margin-top:2px;line-height:1.3;font-style:italic}
-.qi-staff{font-size:10px;color:var(--tx3);font-style:italic;text-align:center;max-width:66px;line-height:1.2;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.qi-staff{font-size:9px;font-style:italic;color:var(--tx3);overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;width:100%;color:var(--tx3);font-style:italic;text-align:center;max-width:66px;line-height:1.2;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .pstaff{font-size:18px;color:var(--tx2);font-style:italic;margin-bottom:8px;display:none;letter-spacing:.01em}
 .ccell-staff{font-size:12px;font-style:italic;margin-top:2px;opacity:.75;line-height:1.2;text-align:center}
 .comm-rtx{flex:1;font-size:17px;font-weight:500;color:var(--tld);display:flex;flex-direction:column;gap:2px}
@@ -499,15 +505,15 @@ const ts=item=>(item.t&&item.t[staffLang])||item.t["cs"]||"";  // staff label
 function toast(m){const e=$("toast");e.textContent=m;e.classList.add("show");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("show"),2200);}
 function closeM(id){$(id).classList.remove("open");}
 
-function toggleDark(){dark=!dark;document.body.classList.toggle("dark",dark);$("dktog").textContent=dark?"☀️":"🌙";}
+function toggleDark(){dark=!dark;document.body.classList.toggle("dark",dark);$("dktog").textContent=dark?"☀️":"🌙";saveData();}
 
 function initLang(){
   const opts=LANGS.map(l=>`<option value="${l.id}">${l.fl} ${l.lb}</option>`).join("");
   $("langsel").innerHTML=opts;$("langsel").value=curLang;
   $("stafflangsel").innerHTML=opts;$("stafflangsel").value=staffLang;
 }
-function changeLang(id){curLang=id;renderCats();renderCards();renderQ();}
-function changeStaffLang(id){staffLang=id;}
+function changeLang(id){curLang=id;renderCats();renderCards();renderQ();saveData();}
+function changeStaffLang(id){staffLang=id;saveData();}
 
 function showView(v){
   ["builder","present","comm","admin"].forEach(s=>{
@@ -552,48 +558,112 @@ function renderQ(){
   $("strbtn").disabled=!queue.length;
   const e=$("qscroll");
   if(!queue.length){e.innerHTML='<span class="qempty">Přidejte pokyny kliknutím na karty výše</span>';return;}
-  e.innerHTML=queue.map((id,i)=>{const d=gi(id);return`<div class="qi" draggable="true" data-id="${id}" data-idx="${i}"
-    ondragstart="dndStart(event,${i})" ondragover="dndOver(event,${i})" ondrop="dndDrop(event,${i})" ondragend="dndEnd(event)"
-    ontouchstart="tdStart(event,${i})" ontouchmove="tdMove(event)" ontouchend="tdEnd(event,${i})">
-    <div class="qi-pos">${i+1}</div>
-    <div class="qi-ic">${d.ic}</div>
-    <div class="qi-tx">${tx(d)}</div>
-    ${curLang!==staffLang?`<div class="qi-staff">${ts(d)}</div>`:""}
-    <button class="qi-rm" onclick="rmQ(${id})">✕</button>
-  </div>`;}).join("");
+  // Build tiles + separators: sep[0] tile[0] sep[1] tile[1] ... sep[n]
+  let html = `<div class="qi-sep" data-sep="0"></div>`;
+  queue.forEach((id,i)=>{
+    const d=gi(id);
+    html += `<div class="qi" draggable="true" data-id="${id}" data-idx="${i}"
+      ondragstart="dndStart(event,${i})" ondragend="dndEnd()"
+      ontouchstart="tdStart(event,${i})" ontouchmove="tdMove(event)" ontouchend="tdEnd(event)">
+      <div class="qi-pos">${i+1}</div>
+      <div class="qi-ic">${d.ic}</div>
+      <div class="qi-tx">${tx(d)}</div>
+      ${curLang!==staffLang?`<div class="qi-staff">${ts(d)}</div>`:""}
+      <div class="qi-drag-handle">••••</div>
+      <button class="qi-rm" onclick="event.stopPropagation();rmQ(${id})">✕</button>
+    </div>`;
+    html += `<div class="qi-sep" data-sep="${i+1}"></div>`;
+  });
+  e.innerHTML = html;
+  // attach dragover/drop to the SCROLL CONTAINER for separator highlighting
+  e.ondragover = dndContainerOver;
+  e.ondrop = dndContainerDrop;
 }
 function rmQ(id){queue=queue.filter(x=>x!==id);renderCards();renderQ();}
-// ── Drag & Drop (mouse) ──
-let dndSrc=-1;
-function dndStart(e,i){dndSrc=i;e.currentTarget.classList.add("dragging");e.dataTransfer.effectAllowed="move";}
-function dndOver(e,i){e.preventDefault();e.dataTransfer.dropEffect="move";document.querySelectorAll(".qi").forEach((el,j)=>el.classList.toggle("drag-over",j===i&&i!==dndSrc));}
-function dndDrop(e,i){e.preventDefault();if(dndSrc<0||dndSrc===i)return;const item=queue.splice(dndSrc,1)[0];queue.splice(i,0,item);renderCards();renderQ();}
-function dndEnd(e){dndSrc=-1;document.querySelectorAll(".qi").forEach(el=>{el.classList.remove("dragging","drag-over");});}
+// ── Drag & Drop: separator insert ──
+let dndSrc=-1, dndInsertBefore=-1;
+
+function dndStart(e,i){
+  dndSrc=i;
+  setTimeout(()=>e.currentTarget.classList.add("dragging"),0);
+  e.dataTransfer.effectAllowed="move";
+  e.dataTransfer.setData("text/plain",String(i));
+}
+function dndContainerOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect="move";
+  const seps=[...$("qscroll").querySelectorAll(".qi-sep")];
+  let best=null,bestDist=Infinity;
+  seps.forEach(sep=>{
+    const r=sep.getBoundingClientRect();
+    const dist=Math.abs(e.clientX-(r.left+r.width/2));
+    if(dist<bestDist){bestDist=dist;best=sep;}
+  });
+  if(best){
+    seps.forEach(s=>s.classList.remove("active"));
+    best.classList.add("active");
+    dndInsertBefore=parseInt(best.dataset.sep);
+  }
+}
+function dndContainerDrop(e){
+  e.preventDefault();
+  if(dndSrc<0)return;
+  let ins=dndInsertBefore;
+  if(ins>dndSrc)ins--;
+  dndEnd();
+  if(ins===dndSrc||ins<0)return;
+  const item=queue.splice(dndSrc,1)[0];
+  queue.splice(ins,0,item);
+  renderCards();renderQ();
+}
+function dndLeave(e,i){/* handled by container */}
+function dndEnd(){
+  dndSrc=-1;dndInsertBefore=-1;
+  document.querySelectorAll(".qi").forEach(el=>el.classList.remove("dragging"));
+  document.querySelectorAll(".qi-sep").forEach(s=>s.classList.remove("active"));
+}
 // ── Touch drag ──
-let tdSrcIdx=-1,tdClone=null,tdScrollStart=0;
+let tdSrc=-1,tdClone=null;
 function tdStart(e,i){
-  tdSrcIdx=i;tdScrollStart=$("qscroll").scrollLeft;
-  const el=e.currentTarget;el.classList.add("dragging");
-  tdClone=el.cloneNode(true);tdClone.style.cssText="position:fixed;opacity:.7;pointer-events:none;z-index:999;width:"+el.offsetWidth+"px;transition:none";
-  const r=el.getBoundingClientRect();tdClone.style.left=r.left+"px";tdClone.style.top=r.top+"px";
+  if(e.target.classList.contains("qi-rm"))return;
+  tdSrc=i;
+  const el=e.currentTarget;
+  setTimeout(()=>el.classList.add("dragging"),0);
+  tdClone=el.cloneNode(true);
+  const r=el.getBoundingClientRect();
+  tdClone.style.cssText=`position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;opacity:.8;pointer-events:none;z-index:999;transition:none;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.22)`;
   document.body.appendChild(tdClone);
 }
 function tdMove(e){
-  if(!tdClone)return;e.preventDefault();
-  const t=e.touches[0];tdClone.style.left=(t.clientX-40)+"px";tdClone.style.top=(t.clientY-40)+"px";
-  document.querySelectorAll(".qi").forEach((el,j)=>{
-    const r=el.getBoundingClientRect();
-    el.classList.toggle("drag-over",j!==tdSrcIdx&&t.clientX>r.left&&t.clientX<r.right);
+  if(!tdClone)return;
+  e.preventDefault();
+  const t=e.touches[0];
+  tdClone.style.left=(t.clientX-44)+"px";
+  tdClone.style.top=(t.clientY-44)+"px";
+  const seps=[...$("qscroll").querySelectorAll(".qi-sep")];
+  let best=null,bestDist=Infinity;
+  seps.forEach(sep=>{
+    const r=sep.getBoundingClientRect();
+    const dist=Math.abs(t.clientX-(r.left+r.width/2));
+    if(dist<bestDist){bestDist=dist;best=sep;}
   });
+  seps.forEach(s=>s.classList.remove("active"));
+  if(best){best.classList.add("active");dndInsertBefore=parseInt(best.dataset.sep);}
 }
-function tdEnd(e,i){
+function tdEnd(e){
   if(tdClone){tdClone.remove();tdClone=null;}
-  document.querySelectorAll(".qi").forEach(el=>el.classList.remove("dragging","drag-over"));
-  let target=-1;
-  const t=e.changedTouches[0];
-  document.querySelectorAll(".qi").forEach((el,j)=>{const r=el.getBoundingClientRect();if(t.clientX>r.left&&t.clientX<r.right)target=j;});
-  if(target>=0&&target!==tdSrcIdx){const item=queue.splice(tdSrcIdx,1)[0];queue.splice(target,0,item);renderCards();renderQ();}
-  tdSrcIdx=-1;
+  document.querySelectorAll(".qi").forEach(el=>el.classList.remove("dragging"));
+  document.querySelectorAll(".qi-sep").forEach(s=>s.classList.remove("active"));
+  if(tdSrc>=0&&dndInsertBefore>=0){
+    let ins=dndInsertBefore;
+    if(ins>tdSrc)ins--;
+    if(ins!==tdSrc){
+      const item=queue.splice(tdSrc,1)[0];
+      queue.splice(ins,0,item);
+      renderCards();renderQ();
+    }
+  }
+  tdSrc=-1;dndInsertBefore=-1;
 }
 
 function startPresent(){presIdx=0;showView("present");renderPresent();setupSwipe();}
@@ -733,6 +803,13 @@ function commReset(){
   renderComm();
 }
 function commGoTo(i){commPath=commPath.slice(0,i+1);renderComm();}
+function adminNav(s){
+  ["inst","cats","comm"].forEach(k=>{
+    const btn=$("anav-"+k), panel=$("ap-"+k);
+    if(btn) btn.classList.toggle("active", k===s);
+    if(panel){ panel.classList.toggle("active", k===s); }
+  });
+}
 function renderAdmin(){renderAInst();renderACats();renderAComm();renderALangTabs();}
 function renderALangTabs(){
   $("altabs").innerHTML=LANGS.map(l=>`<div class="ltab ${l.id===adminLang?"active":""}" onclick="setALang('${l.id}')">${l.fl} ${l.lb}</div>`).join("");
@@ -804,9 +881,9 @@ function saveInstrM(){
   if(!t["cs"]){$("mi-t-cs").focus();toast("Vyplňte alespoň český text");return;}
   const o={ic:$("mi-ic").value.trim()||"💬",cat:$("mi-cat").value,sub:$("mi-sub").value.trim(),t};
   if(editIid){Object.assign(gi(editIid),o);}else{INST.push({id:nii++,...o});}
-  closeM("mi");renderCats();renderCards();renderQ();renderAInst();toast(editIid?"Pokyn upraven":"Pokyn přidán");
+  closeM("mi");renderCats();renderCards();renderQ();renderAInst();saveData();toast(editIid?"Pokyn upraven":"Pokyn přidán");
 }
-function delInstr(id){if(!confirm("Smazat pokyn?"))return;INST=INST.filter(i=>i.id!==id);queue=queue.filter(x=>x!==id);renderCats();renderCards();renderQ();renderAInst();toast("Smazáno");}
+function delInstr(id){if(!confirm("Smazat pokyn?"))return;INST=INST.filter(i=>i.id!==id);queue=queue.filter(x=>x!==id);renderCats();renderCards();renderQ();renderAInst();saveData();toast("Smazáno");}
 
 function openCatM(id){
   editCid=id;
@@ -825,9 +902,9 @@ function saveCatM(){
   if(!name){$("mc-n").focus();return;}
   if(editCid){const c=gc(editCid);c.name=name;c.color=selCatColor;}
   else{const id="cat_"+Date.now();CATS.push({id,name,color:selCatColor});if(!selCat)selCat=id;}
-  closeM("mc");renderCats();renderCards();renderACats();toast(editCid?"Kategorie upravena":"Kategorie přidána");
+  closeM("mc");renderCats();renderCards();renderACats();saveData();toast(editCid?"Kategorie upravena":"Kategorie přidána");
 }
-function delCat(id){if(!confirm("Smazat kategorii?"))return;CATS=CATS.filter(c=>c.id!==id);if(selCat===id)selCat=CATS[0]?.id;renderCats();renderCards();renderACats();toast("Smazáno");}
+function delCat(id){if(!confirm("Smazat kategorii?"))return;CATS=CATS.filter(c=>c.id!==id);if(selCat===id)selCat=CATS[0]?.id;renderCats();renderCards();renderACats();saveData();toast("Smazáno");}
 
 function openCommM(id){
   editCmid=id;
@@ -848,14 +925,45 @@ function saveCommM(){
   const par=$("mcm-par").value||null;
   const o={ic:$("mcm-ic").value.trim()||"💬",bg:selCmColor,tc:selCmColor,par,t};
   if(editCmid){Object.assign(COMM.find(x=>x.id===editCmid),o);}else{COMM.push({id:"ci"+nci++,...o});}
-  closeM("mcm");renderAComm();renderComm();toast(editCmid?"Upraveno":"Přidáno");
+  closeM("mcm");renderAComm();renderComm();saveData();toast(editCmid?"Upraveno":"Přidáno");
 }
-function delComm(id){if(!confirm("Smazat?"))return;COMM=COMM.filter(c=>c.id!==id&&c.par!==id);renderAComm();renderComm();toast("Smazáno");}
+function delComm(id){if(!confirm("Smazat?"))return;COMM=COMM.filter(c=>c.id!==id&&c.par!==id);renderAComm();renderComm();saveData();toast("Smazáno");}
 
 ["mi","mc","mcm"].forEach(id=>{$(id).addEventListener("click",e=>{if(e.target===e.currentTarget)closeM(id);});});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")["mi","mc","mcm"].forEach(closeM);});
 
+loadData();
 initLang();renderCats();renderCards();renderQ();
+
+// ── Persistence ──────────────────────────────────────────────────────────────
+const STORAGE_KEY="aro_data_v1";
+function saveData(){
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify({
+      CATS,INST,COMM,
+      nii,nci,
+      curLang,staffLang,adminLang,dark
+    }));
+  }catch(e){console.warn("Save failed",e);}
+}
+function loadData(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw)return false;
+    const d=JSON.parse(raw);
+    if(d.CATS)CATS=d.CATS;
+    if(d.INST)INST=d.INST;
+    if(d.COMM)COMM=d.COMM;
+    if(d.nii)nii=d.nii;
+    if(d.nci)nci=d.nci;
+    if(d.curLang){curLang=d.curLang;}
+    if(d.staffLang){staffLang=d.staffLang;}
+    if(d.adminLang){adminLang=d.adminLang;}
+    if(d.dark){dark=true;document.body.classList.add("dark");$("dktog").textContent="☀️";}
+    return true;
+  }catch(e){console.warn("Load failed",e);return false;}
+}
+
 </script>
 </body>
 </html>
