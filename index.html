@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ARO Komunikátor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --tl:#1D9E75;--tld:#0F6E56;--tldd:#085041;
+  --tll:#9FE1CB;--tlxl:#E1F5EE;--tlxxl:#F2FAF7;
+  --bg:#FFFFFF;--bg2:#F5FBF8;--bg3:#EDF7F2;
+  --tx:#12211C;--tx2:#4A6A5E;--tx3:#7A9A8E;
+  --br:rgba(15,110,86,.12);--br2:rgba(15,110,86,.22);
+  --red:#A32D2D;--redl:#FCEBEB;
+  --amb:#854F0B;--ambl:#FAEEDA;
+  --blu:#185FA5;--blul:#E6F1FB;
+  --pur:#534AB7;--purl:#EEEDFE;
+  --sh:0 2px 12px rgba(15,110,86,.08);
+  --shl:0 8px 32px rgba(15,110,86,.14);
+  --r:12px;--rl:18px;--rxl:24px;
+}
+.dark{
+  --bg:#0D1F18;--bg2:#112318;--bg3:#162C20;
+  --tx:#E8F5EE;--tx2:#7FB89A;--tx3:#4A7A5E;
+  --br:rgba(160,220,190,.1);--br2:rgba(160,220,190,.2);
+  --tlxl:#0D2E20;--tlxxl:#0A2018;
+  --redl:#2C0D0D;--ambl:#2A1A05;--blul:#0A1E30;--purl:#1A1840;
+  --sh:0 2px 12px rgba(0,0,0,.25);--shl:0 8px 32px rgba(0,0,0,.4);
+}
+html,body{height:100%;font-family:"DM Sans",sans-serif;background:var(--bg2);color:var(--tx);transition:background .25s,color .25s}
+button{cursor:pointer;font-family:"DM Sans",sans-serif;border:none;background:none;color:inherit}
+input,select{font-family:"DM Sans",sans-serif;color:var(--tx)}
+#app{display:flex;flex-direction:column;height:100vh;max-width:1040px;margin:0 auto;background:var(--bg);box-shadow:0 0 0 1px var(--br),var(--shl);transition:background .25s}
+.hdr{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--bg);border-bottom:1px solid var(--br);flex-shrink:0;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:9px;flex:1;min-width:160px}
+.logom{width:30px;height:30px;background:var(--tl);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.logon{font-family:"DM Serif Display",serif;font-size:16px;color:var(--tl);line-height:1.1}
+.logos{font-size:10px;color:var(--tx2);font-weight:300}
+.htabs{display:flex;gap:3px;background:var(--bg3);border-radius:9px;padding:3px}
+.htab{padding:5px 12px;border-radius:7px;font-size:12px;font-weight:500;color:var(--tx2);transition:all .15s;white-space:nowrap}
+.htab.active{background:var(--bg);color:var(--tl);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.htab:hover:not(.active){color:var(--tl)}
+.hright{display:flex;align-items:center;gap:6px;margin-left:auto}
+.langsel{padding:5px 7px;border-radius:7px;border:1px solid var(--br);background:var(--bg2);font-size:12px;color:var(--tx);outline:none;cursor:pointer;max-width:130px}
+.dktog{width:30px;height:30px;border-radius:7px;border:1px solid var(--br);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .15s}
+.dktog:hover{background:var(--bg3)}
+/* BUILDER */
+.builder{display:flex;flex:1;overflow:hidden}
+.sidebar{width:185px;flex-shrink:0;border-right:1px solid var(--br);padding:12px 9px;overflow-y:auto;background:var(--bg2)}
+.seclbl{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;padding:0 5px;margin-bottom:7px;margin-top:2px}
+.catbtn{width:100%;text-align:left;padding:7px 8px;border-radius:8px;font-size:12px;color:var(--tx2);display:flex;align-items:center;gap:7px;transition:all .12s;margin-bottom:2px}
+.catbtn.active{background:var(--bg);color:var(--tl);font-weight:500;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.catbtn:hover:not(.active){background:var(--bg);color:var(--tx)}
+.catdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.catcnt{margin-left:auto;font-size:10px;color:var(--tx3);background:var(--bg3);padding:1px 5px;border-radius:8px}
+.maincol{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.cardsarea{flex:1;padding:12px 14px;overflow-y:auto}
+.cathd{font-family:"DM Serif Display",serif;font-size:18px;color:var(--tl);margin-bottom:11px}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.icard{background:var(--bg2);border:1.5px solid transparent;border-radius:var(--r);padding:13px 9px;cursor:pointer;transition:all .18s;text-align:center;position:relative}
+.icard:hover{background:var(--tlxl);border-color:var(--tll)}
+.icard.sel{background:var(--tlxl);border-color:var(--tl);box-shadow:0 0 0 3px rgba(29,158,117,.12)}
+.icard-ic{font-size:24px;margin-bottom:6px;line-height:1}
+.icard-tx{font-size:11px;font-weight:500;color:var(--tx);line-height:1.35}
+.icard-ck{position:absolute;top:5px;right:5px;width:16px;height:16px;background:var(--tl);border-radius:50%;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .12s}
+.icard.sel .icard-ck{opacity:1}
+/* QUEUE */
+.qpanel{padding:10px 14px;background:var(--bg);border-top:1px solid var(--br);flex-shrink:0}
+.qtop{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.qlbl{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em}
+.qbadge{background:var(--tl);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px}
+.qscroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:5px;min-height:52px;align-items:center}
+.qscroll::-webkit-scrollbar{height:3px}
+.qscroll::-webkit-scrollbar-thumb{background:var(--tll);border-radius:2px}
+.qempty{font-size:12px;color:var(--tx3);font-style:italic}
+
+.qi{display:flex;flex-direction:column;align-items:center;gap:3px;background:var(--bg2);border:1px solid var(--br);border-radius:8px;padding:6px 8px;min-width:68px;max-width:84px;flex-shrink:0;position:relative;cursor:grab;touch-action:none;transition:opacity .15s,box-shadow .15s}
+.qi.dragging{opacity:.45;cursor:grabbing;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.qi.drag-over{border-color:var(--tl);box-shadow:0 0 0 2px rgba(29,158,117,.3)}
+.qi-pos{position:absolute;top:-5px;left:-5px;width:14px;height:14px;background:var(--tl);color:#fff;border-radius:50%;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.qi-ic{font-size:17px}
+.qi-tx{font-size:9px;font-weight:500;color:var(--tx);text-align:center;line-height:1.3;max-width:66px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.qi-rm{position:absolute;top:-5px;right:-5px;width:14px;height:14px;background:var(--red);color:#fff;border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .12s;cursor:pointer;border:none}
+.qi:hover .qi-rm{opacity:1}
+.qacts{display:flex;gap:7px;margin-top:8px}
+.clrbtn{padding:7px 12px;border-radius:8px;font-size:12px;color:var(--tx2);border:1px solid var(--br);transition:all .12s}
+.clrbtn:hover{background:var(--redl);border-color:var(--red);color:var(--red)}
+.strbtn{flex:1;padding:8px;border-radius:8px;background:var(--tl);color:#fff;font-size:13px;font-weight:600;transition:all .15s;box-shadow:0 2px 8px rgba(15,110,86,.22)}
+.strbtn:hover:not(:disabled){background:var(--tld);transform:translateY(-1px)}
+.strbtn:disabled{opacity:.35;cursor:not-allowed}
+/* PRESENT */
+.ph{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--br);flex-shrink:0;background:var(--bg)}
+.pbk{padding:6px 11px;border-radius:7px;font-size:12px;color:var(--tx2);border:1px solid var(--br);transition:all .12s}
+.pbk:hover{background:var(--bg2);color:var(--tl)}
+.pctr{font-size:12px;color:var(--tx2);font-weight:500}
+.pdots{display:flex;gap:4px;flex:1;justify-content:center;flex-wrap:wrap;align-items:center}
+.pdot{height:6px;border-radius:3px;background:var(--br2);transition:all .25s;cursor:pointer}
+.pdot.done{background:var(--tll)}
+.pdot.act{background:var(--tl);width:20px!important}
+.pstage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;text-align:center;background:linear-gradient(155deg,var(--tlxxl) 0%,var(--bg) 55%);overflow:hidden;position:relative;user-select:none}
+.pcatl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;padding:4px 13px;border-radius:20px;margin-bottom:16px}
+.picon{font-size:86px;line-height:1;margin-bottom:20px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.1))}
+.picon.an{animation:ipop .3s cubic-bezier(.34,1.56,.64,1)}
+.ptxt{font-family:"DM Serif Display",serif;font-size:clamp(21px,5vw,36px);color:var(--tx);line-height:1.25;max-width:540px}
+.ptxt.an{animation:tin .22s ease}
+.psub{font-size:14px;color:var(--tx2);margin-top:11px;font-weight:300;font-style:italic}
+.psub.an{animation:tin .22s ease .04s both}
+@keyframes ipop{from{transform:scale(.55);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pnav{display:flex;gap:10px;padding:13px 16px;border-top:1px solid var(--br);flex-shrink:0;background:var(--bg)}
+.pprev{flex:1;padding:12px;border-radius:var(--r);font-size:13px;font-weight:500;color:var(--tx2);border:1.5px solid var(--br);transition:all .15s}
+.pprev:hover:not(:disabled){background:var(--bg2);border-color:var(--br2);color:var(--tl)}
+.pprev:disabled{opacity:.28;cursor:default}
+.pnext{flex:2;padding:12px;border-radius:var(--r);font-size:13px;font-weight:600;color:#fff;background:var(--tl);border:none;transition:all .15s;box-shadow:0 2px 10px rgba(15,110,86,.22)}
+.pnext:hover{background:var(--tld);transform:translateY(-1px)}
+.pfin{flex:2;padding:12px;border-radius:var(--r);font-size:13px;font-weight:600;color:var(--tl);background:var(--tlxl);border:1.5px solid var(--tll);transition:all .15s}
+.pfin:hover{background:var(--tll)}
+/* COMM */
+.comm-hdr{padding:11px 16px;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:10px;flex-shrink:0;background:var(--bg);flex-wrap:wrap}
+.comm-title{font-family:"DM Serif Display",serif;font-size:17px;color:var(--tl);flex:1}
+.comm-crumb{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--tx2)}
+.crumb{color:var(--tl);cursor:pointer;font-weight:500}
+.crumb:hover{text-decoration:underline}
+.comm-grid{flex:1;overflow-y:auto;padding:12px;display:grid;gap:9px;align-content:start}
+.ccell{border-radius:var(--rl);padding:16px 11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:7px;border:2px solid transparent;transition:all .18s;min-height:88px}
+.ccell:hover{transform:scale(1.02);box-shadow:var(--sh)}
+.ccell:active{transform:scale(.97)}
+.ccell-ic{font-size:32px;line-height:1}
+.ccell-tx{font-size:13px;font-weight:600;line-height:1.3}
+.comm-result{background:var(--tlxl);border:2px solid var(--tll);border-radius:var(--rl);padding:14px 16px;margin:12px;display:flex;align-items:center;gap:11px;flex-shrink:0}
+.comm-rtx{flex:1;font-size:15px;font-weight:500;color:var(--tld)}
+.comm-clr{padding:7px 13px;border-radius:8px;font-size:12px;color:var(--tx2);border:1px solid var(--br2);transition:all .12s}
+.comm-clr:hover{background:var(--redl);color:var(--red);border-color:var(--red)}
+/* ADMIN */
+.adminlayout{display:flex;flex:1;overflow:hidden}
+.adminsb{width:175px;flex-shrink:0;border-right:1px solid var(--br);padding:12px 9px;background:var(--bg2);overflow-y:auto}
+.adminmain{flex:1;overflow-y:auto;padding:14px}
+.ashed{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.astitle{font-family:"DM Serif Display",serif;font-size:16px;color:var(--tl)}
+.aadd{padding:6px 13px;border-radius:8px;background:var(--tl);color:#fff;font-size:12px;font-weight:600;transition:all .15s}
+.aadd:hover{background:var(--tld)}
+.anavbtn{width:100%;text-align:left;padding:7px 9px;border-radius:8px;font-size:12px;color:var(--tx2);display:flex;align-items:center;gap:7px;transition:all .12s;margin-bottom:2px}
+.anavbtn.active{background:var(--bg);color:var(--tl);font-weight:500;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.anavbtn:hover:not(.active){background:var(--bg);color:var(--tx)}
+.apanel{display:none}
+.apanel.active{display:block}
+.atable{width:100%;border-collapse:collapse}
+.atable th{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;padding:5px 9px;text-align:left;border-bottom:1px solid var(--br)}
+.atable td{padding:8px 9px;border-bottom:1px solid var(--br);font-size:12px;vertical-align:middle}
+.atable tr:last-child td{border-bottom:none}
+.atable tr:hover td{background:var(--bg2)}
+.a-ic{font-size:19px;text-align:center;width:36px}
+.abadge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.adot{width:6px;height:6px;border-radius:50%}
+.abtns{display:flex;gap:4px;justify-content:flex-end}
+.aedit{padding:4px 9px;border-radius:6px;font-size:11px;color:var(--tx2);border:1px solid var(--br);transition:all .12s}
+.aedit:hover{background:var(--tlxl);color:var(--tl);border-color:var(--tll)}
+.adel{padding:4px 7px;border-radius:6px;font-size:11px;color:var(--red);border:1px solid var(--redl);transition:all .12s}
+.adel:hover{background:var(--redl)}
+.asearch{width:100%;padding:7px 10px;border:1px solid var(--br);border-radius:8px;font-size:12px;background:var(--bg2);outline:none;margin-bottom:11px;color:var(--tx)}
+.asearch:focus{border-color:var(--tl)}
+.ltabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.ltab{padding:4px 10px;border-radius:7px;font-size:11px;font-weight:500;border:1px solid var(--br);color:var(--tx2);transition:all .12s;cursor:pointer}
+.ltab.active{background:var(--tl);color:#fff;border-color:var(--tl)}
+.ltab:hover:not(.active){border-color:var(--tll);color:var(--tl)}
+.swrow{width:6px;height:6px;border-radius:3px;display:inline-block;margin-right:6px}
+/* COLOR SWATCHES */
+.ccolrow{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px}
+.cswatch{width:24px;height:24px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:all .12s;flex-shrink:0}
+.cswatch.active{border-color:var(--tx);transform:scale(1.18)}
+/* MODAL */
+.mbg{display:none;position:fixed;inset:0;background:rgba(5,18,12,.5);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.mbg.open{display:flex}
+.modal{background:var(--bg);border-radius:var(--rxl);padding:20px;width:370px;max-width:95vw;box-shadow:0 24px 64px rgba(0,0,0,.22);border:1px solid var(--br);animation:min .2s cubic-bezier(.34,1.4,.64,1);max-height:90vh;overflow-y:auto}
+@keyframes min{from{transform:scale(.88) translateY(12px);opacity:0}to{transform:none;opacity:1}}
+.modal h3{font-family:"DM Serif Display",serif;font-size:18px;color:var(--tl);margin-bottom:14px}
+.frow{margin-bottom:11px}
+.flbl{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;display:block}
+.finput,.fsel{width:100%;padding:7px 10px;border:1.5px solid var(--br);border-radius:8px;font-size:12px;color:var(--tx);background:var(--bg2);transition:border-color .12s;outline:none}
+.finput:focus,.fsel:focus{border-color:var(--tl);background:var(--bg)}
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mbtns{display:flex;gap:7px;margin-top:14px}
+.mbc{flex:1;padding:8px;border-radius:8px;font-size:12px;color:var(--tx2);border:1.5px solid var(--br);background:var(--bg2);transition:all .12s}
+.mbs{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:600;color:#fff;background:var(--tl);transition:all .15s}
+.mbs:hover{background:var(--tld)}
+.lrow{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.lflag{width:20px;text-align:center;font-size:15px;flex-shrink:0}
+.llbl{width:68px;font-size:11px;color:var(--tx2);flex-shrink:0}
+.lfield{flex:1;padding:5px 9px;border:1px solid var(--br);border-radius:6px;font-size:12px;color:var(--tx);background:var(--bg2);outline:none}
+.lfield:focus{border-color:var(--tl)}
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--tld);color:#fff;padding:8px 16px;border-radius:30px;font-size:12px;font-weight:500;opacity:0;transition:all .28s;z-index:400;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.vas-face{font-size:36px;cursor:pointer;transition:transform .15s;text-align:center;line-height:1;opacity:.55;filter:grayscale(30%)}
+.vas-face.active,.vas-face:hover{transform:scale(1.25);opacity:1;filter:none}
+.vas-num{font-size:13px;font-weight:600;color:var(--tx3);width:18px;text-align:center;transition:color .15s,transform .15s;display:inline-block}
+.vas-num.active{color:var(--tx);transform:scale(1.3)}
+
+/* dual language labels */
+.icard-staff{font-size:9px;color:var(--tx3);margin-top:2px;line-height:1.3;font-style:italic}
+.qi-staff{font-size:8px;color:var(--tx3);font-style:italic;text-align:center;max-width:66px;line-height:1.2;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.pstaff{font-size:14px;color:var(--tx2);font-style:italic;margin-bottom:6px;display:none;letter-spacing:.01em}
+.ccell-staff{font-size:10px;font-style:italic;margin-top:2px;opacity:.75;line-height:1.2;text-align:center}
+.comm-rtx{flex:1;font-size:15px;font-weight:500;color:var(--tld);display:flex;flex-direction:column;gap:2px}
+.comm-rtx-staff{font-size:12px;font-weight:400;color:var(--tx2);font-style:italic}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="hdr">
+  <div class="logo">
+    <div class="logom">🏥</div>
+    <div>
+      <div class="logon">ARO Komunikátor</div>
+      <div class="logos">Pomůcka pro sluchově postižené pacienty</div>
+    </div>
+  </div>
+  <div class="htabs">
+    <button class="htab active" id="tab-builder" onclick="showView('builder')">Sekvence</button>
+    <button class="htab" id="tab-comm" onclick="showView('comm')">Komunikační karta</button>
+    <button class="htab" id="tab-admin" onclick="showView('admin')">⚙ Admin</button>
+  </div>
+  <div class="hright">
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+      <div style="display:flex;align-items:center;gap:4px"><span style="font-size:9px;color:var(--tx3);font-weight:600;text-transform:uppercase;letter-spacing:.07em">Pacient</span>
+    <select class="langsel" id="langsel" onchange="changeLang(this.value)" title="Jazyk pacienta"></select></div>
+      <div style="display:flex;align-items:center;gap:4px"><span style="font-size:9px;color:var(--tl);font-weight:600;text-transform:uppercase;letter-spacing:.07em">Personál</span>
+    <select class="langsel" id="stafflangsel" onchange="changeStaffLang(this.value)" title="Jazyk personálu" style="border-color:var(--tl);font-weight:500"></select></div>
+    </div>
+    <button class="dktog" id="dktog" onclick="toggleDark()" title="Světlý/tmavý režim">🌙</button>
+  </div>
+</div>
+
+<!-- BUILDER -->
+<div id="view-builder" style="display:flex;flex:1;overflow:hidden">
+  <div class="sidebar">
+    <div class="seclbl">Kategorie</div>
+    <div id="catlist"></div>
+  </div>
+  <div class="maincol">
+    <div class="cardsarea">
+      <div class="cathd" id="cathd"></div>
+      <div class="cgrid" id="cgrid"></div>
+    </div>
+    <div class="qpanel">
+      <div class="qtop">
+        <div class="qlbl">Sekvence</div>
+        <div class="qbadge" id="qbadge">0</div>
+      </div>
+      <div class="qscroll" id="qscroll"><span class="qempty">Přidejte pokyny kliknutím na karty výše</span></div>
+      <div class="qacts">
+        <button class="clrbtn" onclick="clearQ()">Vymazat vše</button>
+        <button class="strbtn" id="strbtn" disabled onclick="startPresent()">▶ Spustit prezentaci</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRESENT -->
+<div id="view-present" style="display:none;flex-direction:column;flex:1">
+  <div class="ph">
+    <button class="pbk" onclick="showView('builder')">← Zpět</button>
+    <span class="pctr" id="pctr">1/1</span>
+    <div class="pdots" id="pdots"></div>
+  </div>
+  <div class="pstage" id="pstage">
+    <div class="pcatl" id="pcatl"></div>
+    <div class="pstaff" id="pstaff"></div>
+    <div class="picon" id="picon"></div>
+    <div class="ptxt"  id="ptxt"></div>
+    <div class="psub"  id="psub"></div>
+  </div>
+  <div class="pnav" id="pnav"></div>
+</div>
+
+<!-- COMM CARD -->
+<div id="view-comm" style="display:none;flex-direction:column;flex:1">
+  <div class="comm-hdr">
+    <div class="comm-title" id="comm-title">Komunikační karta</div>
+    <div class="comm-crumb" id="comm-crumb"></div>
+  </div>
+  <div id="comm-res" style="display:none" class="comm-result">
+    <span style="font-size:21px" id="comm-ric"></span>
+    <span class="comm-rtx" id="comm-rtx"></span>
+    <button class="comm-clr" onclick="commReset()">Nový výběr</button>
+  </div>
+  <!-- VAS panel -->
+  <div id="vas-panel" style="display:none;flex-direction:column;flex:1;padding:16px 14px;gap:14px;overflow-y:auto">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button onclick="vasClose()" style="padding:9px 16px;border-radius:10px;border:2px solid var(--br2);background:var(--bg3);font-size:15px;font-weight:600;color:var(--tx2);cursor:pointer">&#8592; Zpět</button>
+      <div style="font-family:DM Serif Display,serif;font-size:17px;color:var(--tl)" id="vas-title">Jak silná je bolest?</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;padding:0 2px">
+      <div class="vas-face" data-v="0" onclick="vasUpdate(0)">&#128522;</div>
+      <div class="vas-face" data-v="2" onclick="vasUpdate(2)">&#128578;</div>
+      <div class="vas-face" data-v="4" onclick="vasUpdate(4)">&#128528;</div>
+      <div class="vas-face" data-v="6" onclick="vasUpdate(6)">&#128543;</div>
+      <div class="vas-face" data-v="8" onclick="vasUpdate(8)">&#128546;</div>
+      <div class="vas-face" data-v="10" onclick="vasUpdate(10)">&#128549;</div>
+    </div>
+    <div style="position:relative;height:26px;border-radius:13px;background:linear-gradient(to right,#2E9E2E,#7DC52E,#D4C400,#E08000,#D04010,#C01010);box-shadow:0 2px 6px rgba(0,0,0,.15)">
+      <div id="vas-thumb" style="position:absolute;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid #333;box-shadow:0 2px 8px rgba(0,0,0,.25);left:0%;pointer-events:none"></div>
+    </div>
+    <input type="range" id="vas-slider" min="0" max="10" value="0" step="1" style="width:100%;opacity:0;height:26px;margin-top:-42px;cursor:pointer;position:relative;z-index:2" oninput="vasUpdate(parseInt(this.value))">
+    <div style="display:flex;justify-content:space-between;padding:0 6px;margin-top:-6px">
+      <span id="vn0"  class="vas-num active">0</span><span id="vn1"  class="vas-num">1</span><span id="vn2"  class="vas-num">2</span>
+      <span id="vn3"  class="vas-num">3</span><span id="vn4"  class="vas-num">4</span><span id="vn5"  class="vas-num">5</span>
+      <span id="vn6"  class="vas-num">6</span><span id="vn7"  class="vas-num">7</span><span id="vn8"  class="vas-num">8</span>
+      <span id="vn9"  class="vas-num">9</span><span id="vn10" class="vas-num">10</span>
+    </div>
+    <div id="vas-box" style="display:flex;align-items:center;justify-content:center;gap:16px;padding:16px;border-radius:16px;background:var(--bg2);border:2px solid var(--br)">
+      <span id="vas-big-face" style="font-size:56px">&#128522;</span>
+      <div><div id="vas-big-num" style="font-size:52px;font-weight:700;line-height:1;color:#2E9E2E">0</div>
+      <div id="vas-big-lbl" style="font-size:13px;color:var(--tx2);margin-top:3px">Žádná bolest</div></div>
+    </div>
+    <button onclick="vasConfirm()" style="padding:15px;border-radius:12px;background:var(--tl);color:#fff;font-size:16px;font-weight:600;border:none;cursor:pointer;box-shadow:0 2px 10px rgba(15,110,86,.22)">Potvrdit &#8594; zobrazit sestře</button>
+  </div>
+  <div class="comm-grid" id="comm-grid"></div>
+</div>
+
+<!-- ADMIN -->
+<div id="view-admin" style="display:none;flex:1;overflow:hidden;flex-direction:column">
+  <div class="adminlayout">
+    <div class="adminsb">
+      <div class="seclbl">Sekce</div>
+      <button class="anavbtn active" id="anav-inst" onclick="adminNav('inst')">📋 Pokyny</button>
+      <button class="anavbtn" id="anav-cats" onclick="adminNav('cats')">🏷 Kategorie</button>
+      <button class="anavbtn" id="anav-comm" onclick="adminNav('comm')">💬 Kom. karta</button>
+    </div>
+    <div class="adminmain">
+      <div id="ap-inst" class="apanel active">
+        <div class="ashed"><div class="astitle">Pokyny</div><button class="aadd" onclick="openInstrM(null)">+ Přidat pokyn</button></div>
+        <input class="asearch" id="asearch" placeholder="Hledat pokyn…" oninput="renderAInst()">
+        <div class="ltabs" id="altabs"></div>
+        <table class="atable"><thead><tr><th style="width:36px"></th><th>Pokyn</th><th>Kategorie</th><th></th></tr></thead><tbody id="aitbody"></tbody></table>
+      </div>
+      <div id="ap-cats" class="apanel">
+        <div class="ashed"><div class="astitle">Kategorie</div><button class="aadd" onclick="openCatM(null)">+ Přidat</button></div>
+        <table class="atable"><thead><tr><th style="width:36px">Barva</th><th>Název</th><th style="width:55px">Pokynů</th><th></th></tr></thead><tbody id="actbody"></tbody></table>
+      </div>
+      <div id="ap-comm" class="apanel">
+        <div class="ashed"><div class="astitle">Komunikační karta</div><button class="aadd" onclick="openCommM(null)">+ Přidat</button></div>
+        <p style="font-size:11px;color:var(--tx2);margin-bottom:10px">Hlavní kategorie nebo podpoložky — nastavte nadřazenou kategorii.</p>
+        <table class="atable"><thead><tr><th style="width:36px"></th><th>Text</th><th>Nadřazená</th><th></th></tr></thead><tbody id="acmbody"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: POKYN -->
+<div class="mbg" id="mi">
+<div class="modal">
+  <h3 id="mi-h">Pokyn</h3>
+  <div class="frow2">
+    <div class="frow"><label class="flbl">Ikona (emoji)</label><input class="finput" id="mi-ic" placeholder="😮" style="font-size:20px;text-align:center"></div>
+    <div class="frow"><label class="flbl">Kategorie</label><select class="fsel" id="mi-cat"></select></div>
+  </div>
+  <div class="frow"><label class="flbl">Překlady</label><div id="mi-langs"></div></div>
+  <div class="frow"><label class="flbl">Doplňující text (český, volitelný)</label><input class="finput" id="mi-sub" placeholder="Pomalu, klidně…"></div>
+  <div class="mbtns"><button class="mbc" onclick="closeM('mi')">Zrušit</button><button class="mbs" onclick="saveInstrM()">Uložit</button></div>
+</div>
+</div>
+
+<!-- MODAL: KATEGORIE -->
+<div class="mbg" id="mc">
+<div class="modal">
+  <h3 id="mc-h">Kategorie</h3>
+  <div class="frow"><label class="flbl">Název</label><input class="finput" id="mc-n" placeholder="Dýchání"></div>
+  <div class="frow"><label class="flbl">Barva</label><div class="ccolrow" id="mc-cols"></div></div>
+  <div class="mbtns"><button class="mbc" onclick="closeM('mc')">Zrušit</button><button class="mbs" onclick="saveCatM()">Uložit</button></div>
+</div>
+</div>
+
+<!-- MODAL: COMM -->
+<div class="mbg" id="mcm">
+<div class="modal">
+  <h3 id="mcm-h">Položka komunikační karty</h3>
+  <div class="frow2">
+    <div class="frow"><label class="flbl">Ikona</label><input class="finput" id="mcm-ic" placeholder="😣" style="font-size:20px;text-align:center"></div>
+    <div class="frow"><label class="flbl">Barva</label><div class="ccolrow" id="mcm-cols" style="margin-top:5px"></div></div>
+  </div>
+  <div class="frow"><label class="flbl">Nadřazená (prázdné = hlavní)</label><select class="fsel" id="mcm-par"></select></div>
+  <div class="frow"><label class="flbl">Překlady textu</label><div id="mcm-langs"></div></div>
+  <div class="mbtns"><button class="mbc" onclick="closeM('mcm')">Zrušit</button><button class="mbs" onclick="saveCommM()">Uložit</button></div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const LANGS=[
+  {id:"cs",lb:"Čeština",fl:"🇨🇿"},{id:"en",lb:"English",fl:"🇬🇧"},{id:"de",lb:"Deutsch",fl:"🇩🇪"},
+  {id:"uk",lb:"Українська",fl:"🇺🇦"},{id:"vi",lb:"Tiếng Việt",fl:"🇻🇳"},{id:"mn",lb:"Монгол",fl:"🇲🇳"},
+  {id:"fr",lb:"Français",fl:"🇫🇷"},{id:"es",lb:"Español",fl:"🇪🇸"},{id:"ar",lb:"العربية",fl:"🇸🇦",rtl:1},
+  {id:"ro",lb:"Romani",fl:"🏴"},{id:"ru",lb:"Русский",fl:"🇷🇺"},
+];
+const COLORS=["#1D9E75","#185FA5","#A32D2D","#534AB7","#854F0B","#3B6D11","#993556","#0F6E56","#BA7517","#2D7A9A"];
+
+let CATS=[
+  {id:"dychani",name:"Dýchání",color:"#185FA5"},
+  {id:"pohyb",name:"Pohyb",color:"#BA7517"},
+  {id:"bolest",name:"Bolest / stav",color:"#A32D2D"},
+  {id:"komunikace",name:"Komunikace",color:"#534AB7"},
+  {id:"procedury",name:"Procedury",color:"#1D9E75"},
+  {id:"vysetreni",name:"Vyšetření",color:"#3B6D11"},
+];
+
+let INST=[
+  {id:1,ic:"😮‍💨",cat:"dychani",sub:"Pomalu, zhluboka",t:{cs:"Zhluboka se nadechněte",en:"Take a deep breath",de:"Tief einatmen",uk:"Зробіть глибокий вдих",vi:"Hít thở sâu",mn:"Гүнзгий амьсгал ав",fr:"Respirez profondément",es:"Respire profundamente",ar:"خذ نفساً عميقاً",ro:"Kher pharo sasimos",ru:"Сделайте глубокий вдох"}},
+  {id:2,ic:"💨",cat:"dychani",sub:"Klidně, bez spěchu",t:{cs:"Vydechněte pomalu",en:"Exhale slowly",de:"Langsam ausatmen",uk:"Видихніть повільно",vi:"Thở ra từ từ",mn:"Удаан амьсгал гарга",fr:"Expirez lentement",es:"Exhale lentamente",ar:"ازفر ببطء",ro:"Pharo sas lungo",ru:"Медленно выдыхайте"}},
+  {id:3,ic:"🫁",cat:"dychani",sub:"Silně odkašlejte",t:{cs:"Odkašlejte si",en:"Please cough",de:"Bitte husten",uk:"Покашляйте",vi:"Hãy ho",mn:"Ханиад гар",fr:"Toussez SVP",es:"Por favor tosa",ar:"من فضلك اسعل",ro:"Kher khanclimos",ru:"Покашляйте"}},
+  {id:4,ic:"⏸️",cat:"dychani",sub:"Jen pár sekund",t:{cs:"Zadržte dech",en:"Hold your breath",de:"Atem anhalten",uk:"Затримайте подих",vi:"Nín thở",mn:"Амьсгалаа барь",fr:"Retenez votre souffle",es:"Aguante la respiración",ar:"احبس نفسك",ro:"Rakhen sasimos",ru:"Задержите дыхание"}},
+  {id:5,ic:"🛑",cat:"pohyb",sub:"Zůstaňte v klidu",t:{cs:"Nehýbejte se",en:"Do not move",de:"Nicht bewegen",uk:"Не рухайтесь",vi:"Đừng cử động",mn:"Хөдлөхгүй байгаарай",fr:"Ne bougez pas",es:"No se mueva",ar:"لا تتحرك",ro:"Na mov tut",ru:"Не двигайтесь"}},
+  {id:6,ic:"↩️",cat:"pohyb",sub:"Pomůžeme vám",t:{cs:"Otočte se na bok",en:"Turn on your side",de:"Auf die Seite drehen",uk:"Повернітьсь на бік",vi:"Lăn sang một bên",mn:"Хажуу тийш эргэ",fr:"Tournez-vous sur le côté",es:"Gírese de lado",ar:"انقلب على جانبك",ro:"Mur pal rig",ru:"Повернитесь на бок"}},
+  {id:7,ic:"😌",cat:"pohyb",sub:"",t:{cs:"Zavřete oči",en:"Close your eyes",de:"Augen schließen",uk:"Заплющте очі",vi:"Nhắm mắt",mn:"Нүдэ ан",fr:"Fermez les yeux",es:"Cierre los ojos",ar:"أغمض عينيك",ro:"Phand yakha",ru:"Закройте глаза"}},
+  {id:8,ic:"👁️",cat:"pohyb",sub:"",t:{cs:"Otevřete oči",en:"Open your eyes",de:"Augen öffnen",uk:"Розплющте очі",vi:"Mở mắt",mn:"Нүдэ нee",fr:"Ouvrez les yeux",es:"Abra los ojos",ar:"افتح عينيك",ro:"Phuk yakha",ru:"Откройте глаза"}},
+  {id:9,ic:"❓",cat:"bolest",sub:"Ukažte nám kde",t:{cs:"Bolí vás něco?",en:"Are you in pain?",de:"Haben Sie Schmerzen?",uk:"Вам боляче?",vi:"Bạn có đau không?",mn:"Та өвдөж байна уу?",fr:"Avez-vous mal?",es:"¿Tiene dolor?",ar:"هل تشعر بألم؟",ro:"Dukhavel tut?",ru:"Вам больно?"}},
+  {id:10,ic:"😣",cat:"bolest",sub:"Číslem 1–10",t:{cs:"Jak silná je bolest?",en:"How strong is the pain?",de:"Wie stark sind die Schmerzen?",uk:"Наскільки сильний біль?",vi:"Cơn đau mạnh thế nào?",mn:"Өвдөлт хэр их вэ?",fr:"Quelle est l'intensité?",es:"¿Qué tan fuerte es el dolor?",ar:"كم شدة الألم؟",ro:"Sar zoro si i dukh?",ru:"Насколько сильная боль?"}},
+  {id:11,ic:"💊",cat:"bolest",sub:"Na bolest i úzkost",t:{cs:"Brzy dostanete léky",en:"You will get medication soon",de:"Sie bekommen bald Medikamente",uk:"Незабаром вам дадуть ліки",vi:"Bạn sẽ được dùng thuốc sớm",mn:"Тантай удахгүй эм өгнө",fr:"Vous aurez des médicaments bientôt",es:"Pronto recibirá medicación",ar:"ستحصل على دواء قريباً",ro:"Mekhas tu love pharuvnas",ru:"Скоро вам дадут лекарство"}},
+  {id:12,ic:"🏥",cat:"komunikace",sub:"Jsme tu s vámi",t:{cs:"Jste v bezpečí",en:"You are safe",de:"Sie sind in Sicherheit",uk:"Ви в безпеці",vi:"Bạn đang an toàn",mn:"Та аюулгүй байна",fr:"Vous êtes en sécurité",es:"Está en un lugar seguro",ar:"أنت بأمان",ro:"San siguro",ru:"Вы в безопасности"}},
+  {id:13,ic:"🙂",cat:"komunikace",sub:"Stiskněte ruku = ano",t:{cs:"Rozumíte mi?",en:"Do you understand me?",de:"Verstehen Sie mich?",uk:"Ви мене розумієте?",vi:"Bạn có hiểu tôi không?",mn:"Намайг ойлгож байна уу?",fr:"Vous me comprenez?",es:"¿Me entiende?",ar:"هل تفهمني؟",ro:"Samajenas ma?",ru:"Вы меня понимаете?"}},
+  {id:14,ic:"🤝",cat:"komunikace",sub:"Jednou=ano, dvakrát=ne",t:{cs:"Stiskněte mi ruku",en:"Squeeze my hand",de:"Drücken Sie meine Hand",uk:"Стисніть мою руку",vi:"Bóp tay tôi",mn:"Гараа зуу",fr:"Serrez ma main",es:"Apriete mi mano",ar:"اضغط على يدي",ro:"Zas ma vast",ru:"Сожмите мою руку"}},
+  {id:15,ic:"🩺",cat:"procedury",sub:"Pocítíte tlak",t:{cs:"Vytáhneme vám trubičku",en:"We will remove the tube",de:"Wir entfernen den Schlauch",uk:"Ми виймемо трубку",vi:"Chúng tôi sẽ rút ống",mn:"Бид хоолойг гаргана",fr:"Nous allons retirer le tube",es:"Vamos a retirar el tubo",ar:"سنزيل الأنبوب",ro:"Mukhas tiri truba",ru:"Мы извлечём трубку"}},
+  {id:16,ic:"💉",cat:"procedury",sub:"Malé štípnutí",t:{cs:"Budete píchnuti jehlou",en:"You will feel a needle",de:"Sie bekommen eine Spritze",uk:"Ви відчуєте укол",vi:"Bạn sẽ cảm thấy kim tiêm",mn:"Та зүү мэдрэнэ",fr:"Vous allez ressentir une piqûre",es:"Sentirá un pinchazo",ar:"ستشعر بوخز إبرة",ro:"Sasa tuke phuv",ru:"Вы почувствуете укол"}},
+  {id:17,ic:"👀",cat:"vysetreni",sub:"Pohybujte pouze očima",t:{cs:"Sledujte mě očima",en:"Follow me with your eyes",de:"Folgen Sie mir mit den Augen",uk:"Стежте за мною очима",vi:"Theo dõi tôi bằng mắt",mn:"Намайг нүдээрээ дагаарай",fr:"Suivez-moi des yeux",es:"Sígame con los ojos",ar:"تابعني بعينيك",ro:"Dikh ma tele yakha",ru:"Следите за мной глазами"}},
+  {id:18,ic:"✋",cat:"vysetreni",sub:"Co nejsilněji",t:{cs:"Zmáčkněte moji ruku",en:"Squeeze my hand hard",de:"Drücken Sie meine Hand fest",uk:"Міцно стисніть мою руку",vi:"Bóp tay tôi thật mạnh",mn:"Гараа хүчтэй зуу",fr:"Serrez fort ma main",es:"Apriete mi mano fuerte",ar:"اضغط على يدي بقوة",ro:"Zas zorales vast",ru:"Крепко сожмите мою руку"}},
+];
+
+let COMM=[
+  {id:"c1",ic:"😣",bg:"#FCEBEB",tc:"#A32D2D",par:null,t:{cs:"Bolest",en:"Pain",de:"Schmerz",uk:"Біль",vi:"Đau",mn:"Өвдөлт",fr:"Douleur",es:"Dolor",ar:"ألم",ro:"Dukh",ru:"Боль"}},
+  {id:"c2",ic:"💧",bg:"#E6F1FB",tc:"#185FA5",par:null,t:{cs:"Žízeň",en:"Thirst",de:"Durst",uk:"Спрага",vi:"Khát",mn:"Цангалт",fr:"Soif",es:"Sed",ar:"عطش",ro:"Trishag",ru:"Жажда"}},
+  {id:"c3",ic:"🍽️",bg:"#EAF3DE",tc:"#3B6D11",par:null,t:{cs:"Hlad",en:"Hunger",de:"Hunger",uk:"Голод",vi:"Đói",mn:"Өлсөлт",fr:"Faim",es:"Hambre",ar:"جوع",ro:"Bokh",ru:"Голод"}},
+  {id:"c4",ic:"😰",bg:"#FAEEDA",tc:"#854F0B",par:null,t:{cs:"Strach / úzkost",en:"Fear / anxiety",de:"Angst",uk:"Страх",vi:"Sợ hãi",mn:"Айдас",fr:"Peur",es:"Miedo",ar:"خوف",ro:"Dar",ru:"Страх"}},
+  {id:"c5",ic:"🚽",bg:"#EEEDFE",tc:"#534AB7",par:null,t:{cs:"Toaleta",en:"Toilet",de:"Toilette",uk:"Туалет",vi:"Nhà vệ sinh",mn:"Жорлон",fr:"Toilettes",es:"Baño",ar:"حمام",ro:"Pani",ru:"Туалет"}},
+  {id:"c6",ic:"🌡️",bg:"#FCEBEB",tc:"#A32D2D",par:null,t:{cs:"Horko / zima",en:"Hot / Cold",de:"Heiß / Kalt",uk:"Жарко / Холодно",vi:"Nóng / Lạnh",mn:"Халуун / Хүйтэн",fr:"Chaud / Froid",es:"Calor / Frío",ar:"حار / بارد",ro:"Tato / Sil",ru:"Жарко / Холодно"}},
+  {id:"c7",ic:"🫀",bg:"#EAF3DE",tc:"#3B6D11",par:null,t:{cs:"Části těla",en:"Body parts",de:"Körperteile",uk:"Частини тіла",vi:"Bộ phận cơ thể",mn:"Биеийн эрхтэн",fr:"Parties du corps",es:"Partes del cuerpo",ar:"أجزاء الجسم",ro:"Trupos than",ru:"Части тела"}},
+  {id:"c8",ic:"✅",bg:"#E1F5EE",tc:"#0F6E56",par:null,t:{cs:"Ano / Dobře",en:"Yes / OK",de:"Ja / OK",uk:"Так / Добре",vi:"Có / Được",mn:"Тийм / Зүгээр",fr:"Oui / OK",es:"Sí / OK",ar:"نعم / حسنا",ro:"Va / Mishtò",ru:"Да / Хорошо"}},
+  {id:"c9",ic:"❌",bg:"#FCEBEB",tc:"#A32D2D",par:null,t:{cs:"Ne / Špatně",en:"No / Not OK",de:"Nein / Schlecht",uk:"Ні / Погано",vi:"Không / Không tốt",mn:"Үгүй / Муу",fr:"Non / Pas bien",es:"No / Mal",ar:"لا / ليس جيداً",ro:"Na / Na mishtò",ru:"Нет / Плохо"}},
+  // ── Bolest → části těla ──
+  {id:"cs1",ic:"🤕",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Hlava",en:"Head",de:"Kopf",uk:"Голова",vi:"Đầu",mn:"Толгой",fr:"Tête",es:"Cabeza",ar:"رأس",ro:"Shero",ru:"Голова"}},
+  {id:"cs2",ic:"😤",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Krk / Hrdlo",en:"Neck / Throat",de:"Hals",uk:"Шия / Горло",vi:"Cổ / Họng",mn:"Хүзүү / Хоолой",fr:"Cou / Gorge",es:"Cuello / Garganta",ar:"رقبة / حلق",ro:"Kork / Kokosh",ru:"Шея / Горло"}},
+  {id:"cs3",ic:"🫀",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Hrudník",en:"Chest",de:"Brust",uk:"Груди",vi:"Ngực",mn:"Цээж",fr:"Poitrine",es:"Pecho",ar:"صدر",ro:"Brek",ru:"Грудь"}},
+  {id:"cs4",ic:"🫁",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Dýchání",en:"Breathing",de:"Atmung",uk:"Дихання",vi:"Hơi thở",mn:"Амьсгал",fr:"Respiration",es:"Respiración",ar:"التنفس",ro:"Sasimos",ru:"Дыхание"}},
+  {id:"cs5",ic:"🫃",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Břicho",en:"Abdomen",de:"Bauch",uk:"Живіт",vi:"Bụng",mn:"Гэдэс",fr:"Ventre",es:"Abdomen",ar:"بطن",ro:"Per",ru:"Живот"}},
+  {id:"cs6",ic:"🔙",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Záda / Zátylek",en:"Back / Neck",de:"Rücken / Nacken",uk:"Спина / Потилиця",vi:"Lưng / Gáy",mn:"Нуруу / Хүзүүний ар",fr:"Dos / Nuque",es:"Espalda / Nuca",ar:"ظهر / رقبة",ro:"Dumo",ru:"Спина / Затылок"}},
+  {id:"cs7",ic:"🦵",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Levá noha",en:"Left leg",de:"Linkes Bein",uk:"Ліва нога",vi:"Chân trái",mn:"Зүүн хөл",fr:"Jambe gauche",es:"Pierna izquierda",ar:"الساق اليسرى",ro:"Bango punro",ru:"Левая нога"}},
+  {id:"cs8",ic:"🦵",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Pravá noha",en:"Right leg",de:"Rechtes Bein",uk:"Права нога",vi:"Chân phải",mn:"Баруун хөл",fr:"Jambe droite",es:"Pierna derecha",ar:"الساق اليمنى",ro:"Chachho punro",ru:"Правая нога"}},
+  {id:"cs9",ic:"💪",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Levá ruka",en:"Left arm",de:"Linker Arm",uk:"Ліва рука",vi:"Tay trái",mn:"Зүүн гар",fr:"Bras gauche",es:"Brazo izquierdo",ar:"الذراع اليسرى",ro:"Bango vast",ru:"Левая рука"}},
+  {id:"cs10",ic:"💪",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Pravá ruka",en:"Right arm",de:"Rechter Arm",uk:"Права рука",vi:"Tay phải",mn:"Баруун гар",fr:"Bras droit",es:"Brazo derecho",ar:"الذراع اليمنى",ro:"Chachho vast",ru:"Правая рука"}},
+  {id:"cs11",ic:"🦶",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Chodidlo",en:"Foot",de:"Fuß",uk:"Стопа",vi:"Bàn chân",mn:"Ул",fr:"Pied",es:"Pie",ar:"قدم",ro:"Pindro",ru:"Стопа"}},
+  {id:"cs12",ic:"🖐",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Ruka / Dlaň",en:"Hand / Palm",de:"Hand",uk:"Долоня / Кисть",vi:"Bàn tay",mn:"Алга",fr:"Main / Paume",es:"Mano",ar:"يد / كف",ro:"Vast",ru:"Кисть / Ладонь"}},
+  {id:"cs13",ic:"🦷",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Zuby / Ústa",en:"Teeth / Mouth",de:"Zähne / Mund",uk:"Зуби / Рот",vi:"Răng / Miệng",mn:"Шүд / Ам",fr:"Dents / Bouche",es:"Dientes / Boca",ar:"أسنان / فم",ro:"Dand / Muj",ru:"Зубы / Рот"}},
+  {id:"cs14",ic:"👂",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Levé ucho",en:"Left ear",de:"Linkes Ohr",uk:"Ліве вухо",vi:"Tai trái",mn:"Зүүн чих",fr:"Oreille gauche",es:"Oído izquierdo",ar:"الأذن اليسرى",ro:"Bango khan",ru:"Левое ухо"}},
+  {id:"cs15",ic:"👂",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Pravé ucho",en:"Right ear",de:"Rechtes Ohr",uk:"Праве вухо",vi:"Tai phải",mn:"Баруун чих",fr:"Oreille droite",es:"Oído derecho",ar:"الأذن اليمنى",ro:"Chachho khan",ru:"Правое ухо"}},
+  {id:"cs16",ic:"👁",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Levé oko",en:"Left eye",de:"Linkes Auge",uk:"Ліве око",vi:"Mắt trái",mn:"Зүүн нүд",fr:"Oeil gauche",es:"Ojo izquierdo",ar:"العين اليسرى",ro:"Bango yakh",ru:"Левый глаз"}},
+  {id:"cs17",ic:"👁",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Pravé oko",en:"Right eye",de:"Rechtes Auge",uk:"Праве око",vi:"Mắt phải",mn:"Баруун нүд",fr:"Oeil droit",es:"Ojo derecho",ar:"العين اليمنى",ro:"Chachho yakh",ru:"Правый глаз"}},
+  {id:"cs18",ic:"🦴",bg:"#FCEBEB",tc:"#A32D2D",par:"c1",t:{cs:"Kyčel / Bok",en:"Hip / Side",de:"Hüfte / Seite",uk:"Стегно / Бік",vi:"Hông / Sườn",mn:"Нуруу / Тал",fr:"Hanche / Côté",es:"Cadera / Costado",ar:"ورك / جانب",ro:"Koko / Rig",ru:"Бедро / Бок"}},
+  // ── Části těla (informační) ──
+  {id:"ct1",ic:"🧠",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Hlava",en:"Head",de:"Kopf",uk:"Голова",vi:"Đầu",mn:"Толгой",fr:"Tête",es:"Cabeza",ar:"رأس",ro:"Shero",ru:"Голова"}},
+  {id:"ct1b",ic:"🧠",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Mozek",en:"Brain",de:"Gehirn",uk:"Мозок",vi:"Não",mn:"Тархи",fr:"Cerveau",es:"Cerebro",ar:"دماغ",ro:"Mindjalimos",ru:"Мозг"}},
+  {id:"ct2a",ic:"👁",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Levé oko",en:"Left eye",de:"Linkes Auge",uk:"Ліве око",vi:"Mắt trái",mn:"Зүүн нүд",fr:"Oeil gauche",es:"Ojo izquierdo",ar:"العين اليسرى",ro:"Bango yakh",ru:"Левый глаз"}},
+  {id:"ct2b",ic:"👁",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Pravé oko",en:"Right eye",de:"Rechtes Auge",uk:"Праве око",vi:"Mắt phải",mn:"Баруун нүд",fr:"Oeil droit",es:"Ojo derecho",ar:"العين اليمنى",ro:"Chachho yakh",ru:"Правый глаз"}},
+  {id:"ct3a",ic:"👂",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Levé ucho",en:"Left ear",de:"Linkes Ohr",uk:"Ліве вухо",vi:"Tai trái",mn:"Зүүн чих",fr:"Oreille gauche",es:"Oído izquierdo",ar:"الأذن اليسرى",ro:"Bango khan",ru:"Левое ухо"}},
+  {id:"ct3b",ic:"👂",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Pravé ucho",en:"Right ear",de:"Rechtes Ohr",uk:"Праве вухо",vi:"Tai phải",mn:"Баруун чих",fr:"Oreille droite",es:"Oído derecho",ar:"الأذن اليمنى",ro:"Chachho khan",ru:"Правое ухо"}},
+  {id:"ct4",ic:"👃",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Nos",en:"Nose",de:"Nase",uk:"Ніс",vi:"Mũi",mn:"Хамар",fr:"Nez",es:"Nariz",ar:"أنف",ro:"Nak",ru:"Нос"}},
+  {id:"ct5",ic:"👄",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Ústa / Jazyk",en:"Mouth / Tongue",de:"Mund / Zunge",uk:"Рот / Язик",vi:"Miệng / Lưỡi",mn:"Ам / Хэл",fr:"Bouche / Langue",es:"Boca / Lengua",ar:"فم / لسان",ro:"Muj / Chib",ru:"Рот / Язык"}},
+  {id:"ct6",ic:"😤",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Krk / Hrdlo",en:"Neck / Throat",de:"Hals / Kehle",uk:"Шия / Горло",vi:"Cổ / Họng",mn:"Хүзүү / Хоолой",fr:"Cou / Gorge",es:"Cuello / Garganta",ar:"رقبة / حلق",ro:"Kork",ru:"Шея / Горло"}},
+  {id:"ct7",ic:"🫀",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Srdce",en:"Heart",de:"Herz",uk:"Серце",vi:"Tim",mn:"Зүрх",fr:"Cœur",es:"Corazón",ar:"قلب",ro:"Yilo",ru:"Сердце"}},
+  {id:"ct8",ic:"🫁",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Plíce",en:"Lungs",de:"Lungen",uk:"Легені",vi:"Phổi",mn:"Уушиг",fr:"Poumons",es:"Pulmones",ar:"رئتين",ro:"Balve",ru:"Лёгкие"}},
+  {id:"ct9",ic:"🫃",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Břicho / Žaludek",en:"Abdomen / Stomach",de:"Bauch / Magen",uk:"Живіт / Шлунок",vi:"Bụng / Dạ dày",mn:"Гэдэс / Ходоод",fr:"Ventre / Estomac",es:"Abdomen / Estómago",ar:"بطن / معدة",ro:"Per",ru:"Живот / Желудок"}},
+  {id:"ct10",ic:"🔙",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Záda",en:"Back",de:"Rücken",uk:"Спина",vi:"Lưng",mn:"Нуруу",fr:"Dos",es:"Espalda",ar:"ظهر",ro:"Dumo",ru:"Спина"}},
+  {id:"ct11",ic:"🦴",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Hrudní kost / Žebra",en:"Sternum / Ribs",de:"Brustbein / Rippen",uk:"Грудина / Ребра",vi:"Xương ức / Xương sườn",mn:"Цээжний яс / Хавирга",fr:"Sternum / Côtes",es:"Esternón / Costillas",ar:"عظمة الصدر / الأضلاع",ro:"Cangalo / Pushka",ru:"Грудина / Рёбра"}},
+  {id:"ct12a",ic:"💪",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Levá ruka",en:"Left arm",de:"Linker Arm",uk:"Ліва рука",vi:"Tay trái",mn:"Зүүн гар",fr:"Bras gauche",es:"Brazo izquierdo",ar:"الذراع اليسرى",ro:"Bango vast",ru:"Левая рука"}},
+  {id:"ct12b",ic:"💪",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Pravá ruka",en:"Right arm",de:"Rechter Arm",uk:"Права рука",vi:"Tay phải",mn:"Баруун гар",fr:"Bras droit",es:"Brazo derecho",ar:"الذراع اليمنى",ro:"Chachho vast",ru:"Правая рука"}},
+  {id:"ct13a",ic:"🖐",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Levá dlaň / Prsty",en:"Left hand / Fingers",de:"Linke Hand / Finger",uk:"Ліва долоня / Пальці",vi:"Bàn tay trái / Ngón tay",mn:"Зүүн алга / Хуруу",fr:"Main gauche / Doigts",es:"Mano izquierda / Dedos",ar:"اليد اليسرى / الأصابع",ro:"Bango vast / Angusht",ru:"Левая кисть / Пальцы"}},
+  {id:"ct13b",ic:"🖐",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Pravá dlaň / Prsty",en:"Right hand / Fingers",de:"Rechte Hand / Finger",uk:"Права долоня / Пальці",vi:"Bàn tay phải / Ngón tay",mn:"Баруун алга / Хуруу",fr:"Main droite / Doigts",es:"Mano derecha / Dedos",ar:"اليد اليمنى / الأصابع",ro:"Chachho vast / Angusht",ru:"Правая кисть / Пальцы"}},
+  {id:"ct14",ic:"🦴",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Kyčel",en:"Hip",de:"Hüfte",uk:"Стегно",vi:"Hông",mn:"Нуруу",fr:"Hanche",es:"Cadera",ar:"ورك",ro:"Koko",ru:"Бедро"}},
+  {id:"ct15a",ic:"🦵",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Levá noha",en:"Left leg",de:"Linkes Bein",uk:"Ліва нога",vi:"Chân trái",mn:"Зүүн хөл",fr:"Jambe gauche",es:"Pierna izquierda",ar:"الساق اليسرى",ro:"Bango punro",ru:"Левая нога"}},
+  {id:"ct15b",ic:"🦵",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Pravá noha",en:"Right leg",de:"Rechtes Bein",uk:"Права нога",vi:"Chân phải",mn:"Баруун хөл",fr:"Jambe droite",es:"Pierna derecha",ar:"الساق اليمنى",ro:"Chachho punro",ru:"Правая нога"}},
+  {id:"ct16",ic:"🦶",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Chodidlo / Kotník",en:"Foot / Ankle",de:"Fuß / Knöchel",uk:"Стопа / Кісточка",vi:"Bàn chân / Mắt cá",mn:"Ул / Шагай",fr:"Pied / Cheville",es:"Pie / Tobillo",ar:"قدم / كاحل",ro:"Pindro / Glemba",ru:"Стопа / Лодыжка"}},
+  {id:"ct17",ic:"🦷",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Zuby",en:"Teeth",de:"Zähne",uk:"Зуби",vi:"Răng",mn:"Шүд",fr:"Dents",es:"Dientes",ar:"أسنان",ro:"Dand",ru:"Зубы"}},
+  {id:"ct18",ic:"👁️",bg:"#EAF3DE",tc:"#3B6D11",par:"c7",t:{cs:"Oči (oba)",en:"Eyes (both)",de:"Augen (beide)",uk:"Очі (obidva)",vi:"Mắt (cả hai)",mn:"Нүд (хоёул)",fr:"Yeux (les deux)",es:"Ojos (ambos)",ar:"العينان (كلتاهما)",ro:"Yakha (amende)",ru:"Оба глаза"}},
+];
+
+let nii=19,nci=100,queue=[],selCat="dychani",curLang="cs",staffLang="cs",adminLang="cs",presIdx=0,dark=false;
+let commPath=[],editIid=null,editCid=null,editCmid=null,selCatColor=COLORS[0],selCmColor=COLORS[2];
+
+const $=id=>document.getElementById(id);
+const gl=id=>LANGS.find(l=>l.id===id);
+const gc=id=>CATS.find(c=>c.id===id)||{name:"?",color:"#999"};
+const gi=id=>INST.find(i=>i.id===id);
+const tx=item=>(item.t&&item.t[curLang])||item.t["cs"]||"";
+const ts=item=>(item.t&&item.t[staffLang])||item.t["cs"]||"";  // staff label
+function toast(m){const e=$("toast");e.textContent=m;e.classList.add("show");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("show"),2200);}
+function closeM(id){$(id).classList.remove("open");}
+
+function toggleDark(){dark=!dark;document.body.classList.toggle("dark",dark);$("dktog").textContent=dark?"☀️":"🌙";}
+
+function initLang(){
+  const opts=LANGS.map(l=>`<option value="${l.id}">${l.fl} ${l.lb}</option>`).join("");
+  $("langsel").innerHTML=opts;$("langsel").value=curLang;
+  $("stafflangsel").innerHTML=opts;$("stafflangsel").value=staffLang;
+}
+function changeLang(id){curLang=id;renderCats();renderCards();renderQ();}
+function changeStaffLang(id){staffLang=id;}
+
+function showView(v){
+  ["builder","present","comm","admin"].forEach(s=>{
+    const e=$("view-"+s);if(e)e.style.display=s===v?"flex":"none";
+  });
+  ["builder","comm","admin"].forEach(t=>{
+    $("tab-"+t)?.classList.toggle("active",t===v||(t==="builder"&&v==="present"));
+  });
+  if(v==="admin")renderAdmin();
+  if(v==="comm"){commPath=[];renderComm();}
+}
+
+function renderCats(){
+  $("catlist").innerHTML=CATS.map(c=>{
+    const cnt=INST.filter(i=>i.cat===c.id).length;
+    return `<button class="catbtn ${c.id===selCat?"active":""}" onclick="selCatFn('${c.id}')">
+      <span class="catdot" style="background:${c.color}"></span>
+      <span style="flex:1">${c.name}</span>
+      <span class="catcnt">${cnt}</span>
+    </button>`;
+  }).join("");
+}
+function selCatFn(id){selCat=id;renderCats();renderCards();}
+function renderCards(){
+  $("cathd").textContent=gc(selCat).name;
+  $("cgrid").innerHTML=INST.filter(i=>i.cat===selCat).map(d=>`
+    <div class="icard ${queue.includes(d.id)?"sel":""}" onclick="toggleQ(${d.id})">
+      <div class="icard-ic">${d.ic}</div>
+      <div class="icard-tx">${tx(d)}</div>
+      ${curLang!==staffLang?`<div class="icard-staff">${ts(d)}</div>`:""}
+      <div class="icard-ck">✓</div>
+    </div>`).join("");
+}
+function toggleQ(id){
+  if(queue.includes(id)){queue=queue.filter(x=>x!==id);}
+  else{queue.push(id);toast("Přidáno do sekvence");}
+  renderCards();renderQ();
+}
+function clearQ(){queue=[];renderCards();renderQ();}
+function renderQ(){
+  $("qbadge").textContent=queue.length;
+  $("strbtn").disabled=!queue.length;
+  const e=$("qscroll");
+  if(!queue.length){e.innerHTML='<span class="qempty">Přidejte pokyny kliknutím na karty výše</span>';return;}
+  e.innerHTML=queue.map((id,i)=>{const d=gi(id);return`<div class="qi" draggable="true" data-id="${id}" data-idx="${i}"
+    ondragstart="dndStart(event,${i})" ondragover="dndOver(event,${i})" ondrop="dndDrop(event,${i})" ondragend="dndEnd(event)"
+    ontouchstart="tdStart(event,${i})" ontouchmove="tdMove(event)" ontouchend="tdEnd(event,${i})">
+    <div class="qi-pos">${i+1}</div>
+    <div class="qi-ic">${d.ic}</div>
+    <div class="qi-tx">${tx(d)}</div>
+    ${curLang!==staffLang?`<div class="qi-staff">${ts(d)}</div>`:""}
+    <button class="qi-rm" onclick="rmQ(${id})">✕</button>
+  </div>`;}).join("");
+}
+function rmQ(id){queue=queue.filter(x=>x!==id);renderCards();renderQ();}
+// ── Drag & Drop (mouse) ──
+let dndSrc=-1;
+function dndStart(e,i){dndSrc=i;e.currentTarget.classList.add("dragging");e.dataTransfer.effectAllowed="move";}
+function dndOver(e,i){e.preventDefault();e.dataTransfer.dropEffect="move";document.querySelectorAll(".qi").forEach((el,j)=>el.classList.toggle("drag-over",j===i&&i!==dndSrc));}
+function dndDrop(e,i){e.preventDefault();if(dndSrc<0||dndSrc===i)return;const item=queue.splice(dndSrc,1)[0];queue.splice(i,0,item);renderCards();renderQ();}
+function dndEnd(e){dndSrc=-1;document.querySelectorAll(".qi").forEach(el=>{el.classList.remove("dragging","drag-over");});}
+// ── Touch drag ──
+let tdSrcIdx=-1,tdClone=null,tdScrollStart=0;
+function tdStart(e,i){
+  tdSrcIdx=i;tdScrollStart=$("qscroll").scrollLeft;
+  const el=e.currentTarget;el.classList.add("dragging");
+  tdClone=el.cloneNode(true);tdClone.style.cssText="position:fixed;opacity:.7;pointer-events:none;z-index:999;width:"+el.offsetWidth+"px;transition:none";
+  const r=el.getBoundingClientRect();tdClone.style.left=r.left+"px";tdClone.style.top=r.top+"px";
+  document.body.appendChild(tdClone);
+}
+function tdMove(e){
+  if(!tdClone)return;e.preventDefault();
+  const t=e.touches[0];tdClone.style.left=(t.clientX-40)+"px";tdClone.style.top=(t.clientY-40)+"px";
+  document.querySelectorAll(".qi").forEach((el,j)=>{
+    const r=el.getBoundingClientRect();
+    el.classList.toggle("drag-over",j!==tdSrcIdx&&t.clientX>r.left&&t.clientX<r.right);
+  });
+}
+function tdEnd(e,i){
+  if(tdClone){tdClone.remove();tdClone=null;}
+  document.querySelectorAll(".qi").forEach(el=>el.classList.remove("dragging","drag-over"));
+  let target=-1;
+  const t=e.changedTouches[0];
+  document.querySelectorAll(".qi").forEach((el,j)=>{const r=el.getBoundingClientRect();if(t.clientX>r.left&&t.clientX<r.right)target=j;});
+  if(target>=0&&target!==tdSrcIdx){const item=queue.splice(tdSrcIdx,1)[0];queue.splice(target,0,item);renderCards();renderQ();}
+  tdSrcIdx=-1;
+}
+
+function startPresent(){presIdx=0;showView("present");renderPresent();setupSwipe();}
+function renderPresent(){
+  const tot=queue.length,d=gi(queue[presIdx]),cat=gc(d.cat);
+  $("pctr").textContent=`${presIdx+1} / ${tot}`;
+  const cl=$("pcatl");cl.textContent=cat.name;cl.style.background=cat.color+"22";cl.style.color=cat.color;
+  ["picon","ptxt","psub"].forEach(id=>$(id).classList.remove("an"));
+  setTimeout(()=>{
+    $("picon").textContent=d.ic;$("picon").classList.add("an");
+    $("ptxt").textContent=tx(d);$("ptxt").classList.add("an");
+    $("psub").textContent=d.sub||"";$("psub").classList.add("an");
+    const sf=$("pstaff");
+    if(curLang!==staffLang){sf.textContent=ts(d);sf.style.display="block";}
+    else{sf.style.display="none";}
+  },10);
+  const sz=Math.max(6,Math.min(12,Math.floor(480/tot)));
+  $("pdots").innerHTML=queue.map((_,i)=>`<div class="pdot ${i===presIdx?"act":i<presIdx?"done":""}" style="width:${i===presIdx?20:sz}px" onclick="goSlide(${i})"></div>`).join("");
+  const last=presIdx===tot-1;
+  $("pnav").innerHTML=`<button class="pprev" onclick="presNav(-1)" ${presIdx===0?"disabled":""}>← Předchozí</button>`+(last?`<button class="pfin" onclick="showView('builder')">✓ Hotovo</button>`:`<button class="pnext" onclick="presNav(1)">Další →</button>`);
+}
+function presNav(d){presIdx+=d;renderPresent();}
+function goSlide(i){presIdx=i;renderPresent();}
+function setupSwipe(){
+  const e=$("pstage");let sx=0,sy=0;
+  e.addEventListener("touchstart",ev=>{sx=ev.touches[0].clientX;sy=ev.touches[0].clientY;},{passive:true});
+  e.addEventListener("touchend",ev=>{
+    const dx=ev.changedTouches[0].clientX-sx,dy=ev.changedTouches[0].clientY-sy;
+    if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40){
+      if(dx<0&&presIdx<queue.length-1)presNav(1);
+      if(dx>0&&presIdx>0)presNav(-1);
+    }
+  },{passive:true});
+}
+document.addEventListener("keydown",e=>{
+  if($("view-present").style.display!=="none"){
+    if(e.key==="ArrowRight"||e.key==="ArrowDown")presIdx<queue.length-1&&presNav(1);
+    if(e.key==="ArrowLeft"||e.key==="ArrowUp")presIdx>0&&presNav(-1);
+  }
+});
+
+function renderComm(){
+  const par=commPath.length?commPath[commPath.length-1].id:null;
+  const items=COMM.filter(c=>c.par===par);
+  $("comm-title").textContent=commPath.length?commPath[commPath.length-1].label:"Komunikační karta";
+  $("comm-crumb").innerHTML=commPath.length?`<span class="crumb" onclick="commReset()">Komunikační karta</span>`+commPath.map((p,i)=>i<commPath.length-1?`<span style="color:var(--tx3)"> › </span><span class="crumb" onclick="commGoTo(${i})">${p.label}</span>`:"").join(""):"";
+  $("comm-res").style.display="none";
+  const cols=Math.max(2,Math.min(4,Math.floor((document.body.clientWidth<600?document.body.clientWidth:520)/140)));
+  $("comm-grid").style.gridTemplateColumns=`repeat(${cols},1fr)`;
+  const backBtn=commPath.length?`<div onclick="commBack()" style="grid-column:1/-1;background:var(--bg3);border:2px solid var(--br2);border-radius:var(--rl);padding:16px;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;min-height:72px;transition:all .15s;font-size:18px;font-weight:600;color:var(--tx2);" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='var(--bg3)'"><span style="font-size:26px">←</span> Zpět</div>`:"";
+  $("comm-grid").innerHTML=backBtn+items.map(c=>{
+    const pt=c.t[curLang]||c.t["cs"];
+    const st=c.t[staffLang]||c.t["cs"];
+    const dual=curLang!==staffLang&&pt!==st;
+    return`<div class="ccell" style="background:${c.bg};border-color:${c.tc}33" onclick="commSel('${c.id}')">
+      <div class="ccell-ic">${c.ic}</div>
+      <div class="ccell-tx" style="color:${c.tc}">${pt}</div>
+      ${dual?`<div class="ccell-staff" style="color:${c.tc}99">${st}</div>`:""}
+    </div>`;}).join("");
+}
+function commBack(){if(commPath.length){commPath.pop();renderComm();}}
+// VAS data
+const VAS_DATA=[
+  {max:0, face:"😊",fc:"#2E9E2E",lbl:{cs:"Žádná bolest",en:"No pain",de:"Kein Schmerz",uk:"Немає болю",vi:"Không đau",mn:"Өвдөхгүй",fr:"Pas de douleur",es:"Sin dolor",ar:"لا ألم",ro:"Khanchi dukh",ru:"Нет боли"}},
+  {max:2, face:"🙂",fc:"#7DC52E",lbl:{cs:"Mírná bolest",en:"Mild pain",de:"Leichter Schmerz",uk:"Легкий біль",vi:"Đau nhẹ",mn:"Бага зэрэг өвдөлт",fr:"Douleur légère",es:"Dolor leve",ar:"ألم خفيف",ro:"Tikni dukh",ru:"Слабая боль"}},
+  {max:4, face:"😐",fc:"#D4C400",lbl:{cs:"Střední bolest",en:"Moderate pain",de:"Mäßiger Schmerz",uk:"Помірний біль",vi:"Đau vừa",mn:"Дунд зэрэг өвдөлт",fr:"Douleur modérée",es:"Dolor moderado",ar:"ألم متوسط",ro:"Meso dukh",ru:"Умеренная боль"}},
+  {max:6, face:"😟",fc:"#E08000",lbl:{cs:"Silná bolest",en:"Strong pain",de:"Starker Schmerz",uk:"Сильний біль",vi:"Đau mạnh",mn:"Хүчтэй өвдөлт",fr:"Douleur forte",es:"Dolor fuerte",ar:"ألم شديد",ro:"Zoro dukh",ru:"Сильная боль"}},
+  {max:8, face:"😢",fc:"#D04010",lbl:{cs:"Velmi silná bolest",en:"Very strong pain",de:"Sehr starker Schmerz",uk:"Дуже сильний біль",vi:"Đau rất mạnh",mn:"Маш хүчтэй өвдөлт",fr:"Douleur très forte",es:"Dolor muy fuerte",ar:"ألم شديد جداً",ro:"But zoro dukh",ru:"Очень сильная боль"}},
+  {max:10,face:"😭",fc:"#C01010",lbl:{cs:"Nesnesitelná bolest",en:"Unbearable pain",de:"Unerträglicher Schmerz",uk:"Нестерпний біль",vi:"Đau không chịu được",mn:"Тэвчишгүй өвдөлт",fr:"Douleur insupportable",es:"Dolor insoportable",ar:"ألم لا يُحتمل",ro:"Nashti boldipe",ru:"Невыносимая боль"}},
+];
+let vasValue=0, vasPrevPath=[];
+function getVasLevel(v){return VAS_DATA.find(d=>v<=d.max)||VAS_DATA[VAS_DATA.length-1];}
+function vasUpdate(v){
+  vasValue=v;
+  $("vas-slider").value=v;
+  $("vas-thumb").style.left=(v/10*100)+"%";
+  const lv=getVasLevel(v);
+  $("vas-big-face").textContent=lv.face;
+  $("vas-big-num").textContent=v;
+  $("vas-big-num").style.color=lv.fc;
+  $("vas-big-lbl").textContent=lv.lbl[curLang]||lv.lbl["cs"];
+  document.querySelectorAll(".vas-face").forEach(el=>{
+    const dv=parseInt(el.dataset.v);el.classList.toggle("active",dv===Math.round(v/2)*2);
+  });
+  for(let i=0;i<=10;i++){const el=$("vn"+i);if(el)el.classList.toggle("active",i===v);}
+}
+function vasConfirm(){
+  const lv=getVasLevel(vasValue);
+  const pathLabel=vasPrevPath.map(p=>p.label).join(" › ");
+  const label=(pathLabel?pathLabel+" › ":"")+(lv.lbl[curLang]||lv.lbl["cs"])+" (VAS "+vasValue+"/10)";
+  const pathLabelS=vasPrevPath.map(p=>p.t?p.t[staffLang]||p.label:p.label).join(" › ");
+  const labelS=curLang!==staffLang?(pathLabelS?pathLabelS+" › ":"")+(lv.lbl[staffLang]||lv.lbl["cs"])+" (VAS "+vasValue+"/10)":"";
+  $("vas-panel").style.display="none";
+  $("comm-grid").style.display="grid";
+  $("comm-ric").textContent=lv.face;
+  $("comm-rtx").innerHTML=`<span>${label}</span>${labelS&&labelS!==label?`<span class="comm-rtx-staff">${labelS}</span>`:""}`;
+  $("comm-res").style.display="flex";
+}
+function vasClose(){
+  $("vas-panel").style.display="none";$("comm-grid").style.display="grid";
+  commPath=vasPrevPath.slice();renderComm();
+}
+function openVas(pathCtx){
+  vasPrevPath=pathCtx.slice();vasValue=0;
+  $("vas-slider").value=0;
+  $("vas-big-lbl").textContent=VAS_DATA[0].lbl[curLang]||VAS_DATA[0].lbl["cs"];
+  vasUpdate(0);
+  $("comm-grid").style.display="none";
+  $("comm-res").style.display="none";
+  $("vas-panel").style.display="flex";
+}
+function commSel(id){
+  const item=COMM.find(c=>c.id===id);
+  const lbl=item.t[curLang]||item.t["cs"];
+  // "Jak silná je bolest?" special case on c10 or any leaf under c1 path
+  if(id==="c10"){openVas(commPath);return;}
+  const hasSubs=COMM.some(c=>c.par===id);
+  if(hasSubs){commPath.push({id,label:lbl,t:item.t});renderComm();}
+  else{
+    // If we're inside the pain path (c1), after selecting body part → show VAS
+    const inPain=commPath.some(p=>p.id==="c1")||id==="c1";
+    if(inPain){
+      commPath.push({id,label:lbl,t:item.t});
+      openVas(commPath);
+    } else {
+      const full=[...commPath.map(p=>p.label),lbl].join(" › ");
+      const fullStaff=curLang!==staffLang?[...commPath.map(p=>p.t?p.t[staffLang]||p.label:p.label),item.t[staffLang]||lbl].join(" › "):"";
+  $("comm-ric").textContent=item.ic;
+  $("comm-rtx").innerHTML=`<span>${full}</span>${fullStaff&&fullStaff!==full?`<span class="comm-rtx-staff">${fullStaff}</span>`:""}`;
+  $("comm-res").style.display="flex";
+    }
+  }
+}
+function commReset(){
+  commPath=[];$("comm-res").style.display="none";
+  $("vas-panel").style.display="none";$("comm-grid").style.display="grid";
+  renderComm();
+}
+function commGoTo(i){commPath=commPath.slice(0,i+1);renderComm();}
+function renderAdmin(){renderAInst();renderACats();renderAComm();renderALangTabs();}
+function renderALangTabs(){
+  $("altabs").innerHTML=LANGS.map(l=>`<div class="ltab ${l.id===adminLang?"active":""}" onclick="setALang('${l.id}')">${l.fl} ${l.lb}</div>`).join("");
+}
+function setALang(id){adminLang=id;renderALangTabs();renderAInst();}
+function renderAInst(){
+  const q=($("asearch").value||"").toLowerCase();
+  const rows=INST.filter(i=>!q||(i.t["cs"]||"").toLowerCase().includes(q)||(i.t[adminLang]||"").toLowerCase().includes(q));
+  $("aitbody").innerHTML=rows.map(d=>{
+    const cat=gc(d.cat),txt=d.t[adminLang]||`<em style="color:var(--tx3)">— bez překladu —</em>`;
+    return`<tr>
+      <td class="a-ic">${d.ic}</td>
+      <td><div style="font-weight:500">${txt}</div>${adminLang!=="cs"?`<div style="font-size:10px;color:var(--tx3)">${d.t["cs"]||""}</div>`:""}</td>
+      <td><span class="abadge" style="background:${cat.color}22;color:${cat.color}"><span class="adot" style="background:${cat.color}"></span>${cat.name}</span></td>
+      <td><div class="abtns"><button class="aedit" onclick="openInstrM(${d.id})">✏</button><button class="adel" onclick="delInstr(${d.id})">🗑</button></div></td>
+    </tr>`;
+  }).join("");
+}
+function renderACats(){
+  $("actbody").innerHTML=CATS.map(c=>{
+    const cnt=INST.filter(i=>i.cat===c.id).length;
+    return`<tr>
+      <td><span style="display:inline-block;width:20px;height:20px;border-radius:5px;background:${c.color}"></span></td>
+      <td style="font-weight:500">${c.name}</td>
+      <td style="text-align:center;color:var(--tx2)">${cnt}</td>
+      <td><div class="abtns"><button class="aedit" onclick="openCatM('${c.id}')">✏</button><button class="adel" onclick="delCat('${c.id}')">🗑</button></div></td>
+    </tr>`;
+  }).join("");
+}
+function renderAComm(){
+  $("acmbody").innerHTML=COMM.map(c=>{
+    const par=c.par?COMM.find(x=>x.id===c.par):null;
+    return`<tr>
+      <td class="a-ic">${c.ic}</td>
+      <td style="font-weight:500">${c.t["cs"]||""}</td>
+      <td style="color:var(--tx2);font-size:11px">${par?par.t["cs"]:"—"}</td>
+      <td><div class="abtns"><button class="aedit" onclick="openCommM('${c.id}')">✏</button><button class="adel" onclick="delComm('${c.id}')">🗑</button></div></td>
+    </tr>`;
+  }).join("");
+}
+
+function buildLangInputs(containerId,prefix,existing){
+  $(containerId).innerHTML=LANGS.map(l=>`
+    <div class="lrow">
+      <span class="lflag">${l.fl}</span>
+      <span class="llbl">${l.lb}</span>
+      <input class="lfield" id="${prefix}-${l.id}" value="${existing&&existing[l.id]||""}" placeholder="${l.lb}…"${l.rtl?' dir="rtl"':""}>
+    </div>`).join("");
+}
+function collectLangs(prefix){
+  const t={};LANGS.forEach(l=>{const v=$(prefix+"-"+l.id).value.trim();if(v)t[l.id]=v;});return t;
+}
+function buildColorSwatches(containerId,sel,cb){
+  $(containerId).innerHTML=COLORS.map(col=>`<div class="cswatch ${col===sel?"active":""}" style="background:${col}" onclick="${cb}('${col}')"></div>`).join("");
+}
+
+function openInstrM(id){
+  editIid=id;
+  const d=id?gi(id):{ic:"💬",cat:CATS[0].id,sub:"",t:{}};
+  $("mi-h").textContent=id?"Upravit pokyn":"Nový pokyn";
+  $("mi-ic").value=d.ic;$("mi-sub").value=d.sub||"";
+  $("mi-cat").innerHTML=CATS.map(c=>`<option value="${c.id}"${c.id===d.cat?" selected":""}>${c.name}</option>`).join("");
+  buildLangInputs("mi-langs","mi-t",d.t);
+  $("mi").classList.add("open");
+  setTimeout(()=>$("mi-t-cs").focus(),60);
+}
+function saveInstrM(){
+  const t=collectLangs("mi-t");
+  if(!t["cs"]){$("mi-t-cs").focus();toast("Vyplňte alespoň český text");return;}
+  const o={ic:$("mi-ic").value.trim()||"💬",cat:$("mi-cat").value,sub:$("mi-sub").value.trim(),t};
+  if(editIid){Object.assign(gi(editIid),o);}else{INST.push({id:nii++,...o});}
+  closeM("mi");renderCats();renderCards();renderQ();renderAInst();toast(editIid?"Pokyn upraven":"Pokyn přidán");
+}
+function delInstr(id){if(!confirm("Smazat pokyn?"))return;INST=INST.filter(i=>i.id!==id);queue=queue.filter(x=>x!==id);renderCats();renderCards();renderQ();renderAInst();toast("Smazáno");}
+
+function openCatM(id){
+  editCid=id;
+  const c=id?gc(id):{name:"",color:COLORS[0]};
+  if(c.name==="?")c.name="";
+  selCatColor=c.color||COLORS[0];
+  $("mc-h").textContent=id?"Upravit kategorii":"Nová kategorie";
+  $("mc-n").value=c.name;
+  buildColorSwatches("mc-cols",selCatColor,"pickCC");
+  $("mc").classList.add("open");
+  setTimeout(()=>$("mc-n").focus(),60);
+}
+function pickCC(col){selCatColor=col;buildColorSwatches("mc-cols",col,"pickCC");}
+function saveCatM(){
+  const name=$("mc-n").value.trim();
+  if(!name){$("mc-n").focus();return;}
+  if(editCid){const c=gc(editCid);c.name=name;c.color=selCatColor;}
+  else{const id="cat_"+Date.now();CATS.push({id,name,color:selCatColor});if(!selCat)selCat=id;}
+  closeM("mc");renderCats();renderCards();renderACats();toast(editCid?"Kategorie upravena":"Kategorie přidána");
+}
+function delCat(id){if(!confirm("Smazat kategorii?"))return;CATS=CATS.filter(c=>c.id!==id);if(selCat===id)selCat=CATS[0]?.id;renderCats();renderCards();renderACats();toast("Smazáno");}
+
+function openCommM(id){
+  editCmid=id;
+  const c=id?COMM.find(x=>x.id===id):{ic:"💬",bg:COLORS[0],tc:COLORS[0],par:null,t:{}};
+  selCmColor=c.bg||COLORS[0];
+  $("mcm-h").textContent=id?"Upravit položku":"Nová položka";
+  $("mcm-ic").value=c.ic;
+  $("mcm-par").innerHTML=`<option value="">— hlavní kategorie —</option>`+COMM.filter(x=>x.par===null&&x.id!==id).map(x=>`<option value="${x.id}"${x.id===c.par?" selected":""}>${x.t["cs"]}</option>`).join("");
+  buildColorSwatches("mcm-cols",selCmColor,"pickCmC");
+  buildLangInputs("mcm-langs","mcm-t",c.t);
+  $("mcm").classList.add("open");
+  setTimeout(()=>$("mcm-t-cs").focus(),60);
+}
+function pickCmC(col){selCmColor=col;buildColorSwatches("mcm-cols",col,"pickCmC");}
+function saveCommM(){
+  const t=collectLangs("mcm-t");
+  if(!t["cs"]){$("mcm-t-cs").focus();toast("Vyplňte alespoň český text");return;}
+  const par=$("mcm-par").value||null;
+  const o={ic:$("mcm-ic").value.trim()||"💬",bg:selCmColor,tc:selCmColor,par,t};
+  if(editCmid){Object.assign(COMM.find(x=>x.id===editCmid),o);}else{COMM.push({id:"ci"+nci++,...o});}
+  closeM("mcm");renderAComm();renderComm();toast(editCmid?"Upraveno":"Přidáno");
+}
+function delComm(id){if(!confirm("Smazat?"))return;COMM=COMM.filter(c=>c.id!==id&&c.par!==id);renderAComm();renderComm();toast("Smazáno");}
+
+["mi","mc","mcm"].forEach(id=>{$(id).addEventListener("click",e=>{if(e.target===e.currentTarget)closeM(id);});});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")["mi","mc","mcm"].forEach(closeM);});
+
+initLang();renderCats();renderCards();renderQ();
+</script>
+</body>
+</html>
