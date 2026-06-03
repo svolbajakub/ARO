@@ -151,7 +151,7 @@ input,select{font-family:"DM Sans",sans-serif;color:var(--tx)}
 .comm-clr:hover{background:var(--redl);color:var(--red);border-color:var(--red)}
 /* ADMIN */
 .adminlayout{display:flex;flex:1;overflow:hidden}
-.adminsb{width:175px;flex-shrink:0;border-right:1px solid var(--br);padding:12px 9px;background:var(--bg2);overflow-y:auto}
+.adminsb{width:175px;flex-shrink:0;border-right:1px solid var(--br);padding:12px 9px;background:var(--bg2);overflow-y:auto;display:flex;flex-direction:column}
 .adminmain{flex:1;overflow-y:auto;padding:12px}
 .ashed{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
 .astitle{font-size:19px;font-weight:700;color:var(--tl)}
@@ -391,6 +391,7 @@ input,select{font-family:"DM Sans",sans-serif;color:var(--tx)}
       <button class="anavbtn" id="anav-comm" onclick="adminNav('comm')">💬 Kom. karta</button>
       <div style="border-top:1px solid var(--br);margin:8px 0"></div>
       <button class="anavbtn" onclick="openM('m-backup')" style="color:var(--tl);font-weight:500">🔄 Záloha / Sdílení</button>
+      <button class="anavbtn" onclick="openM('m-about')" style="margin-top:auto;color:var(--tx3)">ℹ O aplikaci</button>
     </div>
     <div class="adminmain">
       <div id="ap-inst" class="apanel active">
@@ -494,10 +495,8 @@ input,select{font-family:"DM Sans",sans-serif;color:var(--tx)}
     <p style="font-size:12px;color:var(--tx2);margin-bottom:10px">Exportujte data pro zálohu nebo sdílení. Importem přepíšete aktuální data.</p>
     <div style="display:flex;gap:8px">
       <button class="mbs" onclick="exportJSON()" style="flex:1;padding:10px">⬇ Exportovat JSON</button>
-      <label class="mbs" style="flex:1;padding:10px;text-align:center;cursor:pointer">
-        ⬆ Importovat JSON
-        <input type="file" accept=".json" onchange="importJSON(event)" style="display:none">
-      </label>
+      <button class="mbs" onclick="document.getElementById('json-file-input').click()" style="flex:1;padding:10px">⬆ Importovat JSON</button>
+      <input type="file" id="json-file-input" accept=".json" onchange="importJSON(event)" style="display:none">
     </div>
   </div>
 
@@ -513,6 +512,39 @@ input,select{font-family:"DM Sans",sans-serif;color:var(--tx)}
 
   <div class="mbtns" style="margin-top:16px">
     <button class="mbc" onclick="closeM('m-backup')">Zavřít</button>
+  </div>
+</div>
+</div>
+
+
+<!-- MODAL: O APLIKACI -->
+<div class="mbg" id="m-about">
+<div class="modal" style="width:460px">
+  <h3>O aplikaci</h3>
+  <div style="display:flex;flex-direction:column;gap:14px;font-size:13px;color:var(--tx2);line-height:1.6">
+    <div>
+      <div style="font-size:22px;margin-bottom:6px">🏥</div>
+      <strong style="color:var(--tx)">ARO Komunikátor</strong><br>
+      Zdravotnická pomůcka pro komunikaci s pacienty se sluchovým postižením na ARO/JIP.
+    </div>
+    <div style="background:var(--ambl);border-radius:8px;padding:12px;border-left:3px solid var(--amb)">
+      <strong style="color:var(--amb)">⚠ Upozornění</strong><br>
+      Tato aplikace <strong>není certifikovaným zdravotnickým prostředkem</strong> ve smyslu zákona č. 375/2022 Sb. ani nařízení EU 2017/745 (MDR). Slouží výhradně jako komunikační pomůcka a nenahrazuje zdravotnickou dokumentaci ani odborný úsudek zdravotnického personálu.
+    </div>
+    <div>
+      <strong style="color:var(--tx)">Vznik</strong><br>
+      Aplikace vznikla jako reakce na konkrétní klinickou situaci — potřebu důstojné a efektivní komunikace s pacientem se sluchovým postižením v prostředí intenzivní péče.
+    </div>
+    <div>
+      <strong style="color:var(--tx)">Tvůrce</strong><br>
+      Jakub Švolba ve spolupráci s Claude (Anthropic). Vzniklo jako open-source nástroj pro zdravotnický personál. Žádná komerční licence. Volně šiřitelné.
+    </div>
+    <div style="font-size:11px;color:var(--tx3);border-top:1px solid var(--br);padding-top:10px">
+      Verze 1.0 · 2026 · HTML/PWA · Offline first
+    </div>
+  </div>
+  <div class="mbtns" style="margin-top:16px">
+    <button class="mbs" onclick="closeM('m-about')" style="flex:1">Zavřít</button>
   </div>
 </div>
 </div>
@@ -1246,12 +1278,17 @@ function importJSON(e){
   const reader = new FileReader();
   reader.onload = ev => {
     try {
-      applyImport(JSON.parse(ev.target.result));
+      const data = JSON.parse(ev.target.result);
+      applyImport(data);
     } catch(err) {
-      toast("Chyba při importu JSON");
+      console.error("Import error:", err);
+      toast("Chyba při importu: " + err.message);
     }
   };
+  reader.onerror = () => toast("Nelze přečíst soubor");
   reader.readAsText(file);
+  // Reset input so same file can be re-imported
+  e.target.value = "";
 }
 
 function applyImport(d){
