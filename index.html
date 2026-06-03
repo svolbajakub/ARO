@@ -1301,8 +1301,8 @@ function applyImport(d){
   if(d.dark!==undefined && d.dark!==dark) toggleDark();
   fixCommColors();
   saveData();
-  renderAll();
-  if(typeof renderAdmin==="function") renderAdmin();
+  renderCats(); renderCards(); renderQ();
+  renderAdmin();
   closeM("m-backup");
   toast("Data importována ✓");
 }
