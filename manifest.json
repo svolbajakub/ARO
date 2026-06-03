@@ -2,7 +2,7 @@
   "name": "ARO Komunikátor",
   "short_name": "ARO Kom.",
   "description": "Komunikační pomůcka pro sluchově postižené pacienty na ARO",
-  "start_url": "./aro-komunikator.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1D9E75",
