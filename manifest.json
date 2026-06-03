@@ -1,6 +1,6 @@
 {
   "name": "ARO Komunikátor",
-  "short_name": "ARO Kom.",
+  "short_name": "ARO Komunikátor",
   "description": "Komunikační pomůcka pro sluchově postižené pacienty na ARO",
   "start_url": "./index.html",
   "display": "standalone",
