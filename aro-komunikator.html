@@ -389,6 +389,8 @@ input,select{font-family:"DM Sans",sans-serif;color:var(--tx)}
       <button class="anavbtn active" id="anav-inst" onclick="adminNav('inst')">📋 Pokyny</button>
       <button class="anavbtn" id="anav-cats" onclick="adminNav('cats')">🏷 Kategorie</button>
       <button class="anavbtn" id="anav-comm" onclick="adminNav('comm')">💬 Kom. karta</button>
+      <div style="border-top:1px solid var(--br);margin:8px 0"></div>
+      <button class="anavbtn" onclick="openM('m-backup')" style="color:var(--tl);font-weight:500">🔄 Záloha / Sdílení</button>
     </div>
     <div class="adminmain">
       <div id="ap-inst" class="apanel active">
@@ -476,6 +478,41 @@ input,select{font-family:"DM Sans",sans-serif;color:var(--tx)}
   <div class="mbtns">
     <button class="mbc" onclick="closeM('mcm')">Zrušit</button>
     <button class="mbs" onclick="saveCommM()">Uložit</button>
+  </div>
+</div>
+</div>
+
+
+<!-- MODAL: ZÁLOHA / SDÍLENÍ -->
+<div class="mbg" id="m-backup">
+<div class="modal" style="width:480px;max-height:90vh;overflow-y:auto">
+  <h3>Záloha a sdílení dat</h3>
+
+  <!-- Export JSON -->
+  <div style="margin-bottom:20px">
+    <div style="font-size:13px;font-weight:600;color:var(--tx);margin-bottom:6px">💾 Export / Import JSON</div>
+    <p style="font-size:12px;color:var(--tx2);margin-bottom:10px">Exportujte data pro zálohu nebo sdílení. Importem přepíšete aktuální data.</p>
+    <div style="display:flex;gap:8px">
+      <button class="mbs" onclick="exportJSON()" style="flex:1;padding:10px">⬇ Exportovat JSON</button>
+      <label class="mbs" style="flex:1;padding:10px;text-align:center;cursor:pointer">
+        ⬆ Importovat JSON
+        <input type="file" accept=".json" onchange="importJSON(event)" style="display:none">
+      </label>
+    </div>
+  </div>
+
+  <!-- Sdílení přes systém -->
+  <div style="border-top:1px solid var(--br);padding-top:16px;margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;color:var(--tx);margin-bottom:6px">📤 Sdílet data</div>
+    <p style="font-size:12px;color:var(--tx2);margin-bottom:10px">Sdílejte data přes AirDrop, WhatsApp, Mail nebo jiný systémový kanál.</p>
+    <button class="mbs" onclick="shareJSON()" style="width:100%;padding:10px">📤 Sdílet přes AirDrop / WhatsApp / Mail…</button>
+    <p style="font-size:11px;color:var(--tx3);margin-top:6px;text-align:center">Příjemce soubor otevře v aplikaci přes "Importovat JSON"</p>
+  </div>
+
+
+
+  <div class="mbtns" style="margin-top:16px">
+    <button class="mbc" onclick="closeM('m-backup')">Zavřít</button>
   </div>
 </div>
 </div>
@@ -874,7 +911,7 @@ function renderComm(){
 
     // Body figure tile (30% right)
     const bodyTile = `<div class="comm-body-tile" onclick="openBodyModel([])">
-      <div style="font-size:32px;margin-bottom:8px"></div>
+      <div style="font-size:32px;margin-bottom:8px">🫀</div>
       <svg viewBox="20 0 160 340" style="width:130px;height:auto;opacity:.9" xmlns="http://www.w3.org/2000/svg">
         <ellipse cx="100" cy="38" rx="26" ry="34" fill="#F2C4B0" stroke="#AAA" stroke-width="1.5"/>
         <rect x="72" y="72" width="56" height="70" rx="4" fill="#C8D8F0" stroke="#AAA" stroke-width="1.2"/>
@@ -1180,9 +1217,129 @@ function delComm(id){if(!confirm("Smazat?"))return;COMM=COMM.filter(c=>c.id!==id
 ["mi","mc","mcm"].forEach(id=>{$(id).addEventListener("click",e=>{if(e.target===e.currentTarget)closeM(id);});});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")["mi","mc","mcm"].forEach(closeM);});
 
+
+// ── Záloha a sdílení ──────────────────────────────────────────────────────────
+function openM(id){ $(id).classList.add("open"); }
+
+function getExportData(){
+  return JSON.stringify({
+    v:2, ts:Date.now(),
+    CATS, INST, COMM, nii, nci,
+    curLang, staffLang, dark
+  }, null, 2);
+}
+
+function exportJSON(){
+  const blob = new Blob([getExportData()], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "aro-data-"+new Date().toISOString().slice(0,10)+".json";
+  a.click();
+  URL.revokeObjectURL(url);
+  toast("Data exportována ✓");
+}
+
+function importJSON(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      applyImport(JSON.parse(ev.target.result));
+    } catch(err) {
+      toast("Chyba při importu JSON");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function applyImport(d){
+  if(!d || !d.CATS || !d.INST) { toast("Neplatný soubor"); return; }
+  if(!confirm("Přepsat aktuální data importovanými?")) return;
+  CATS=d.CATS; INST=d.INST; COMM=d.COMM||COMM;
+  nii=d.nii||nii; nci=d.nci||nci;
+  if(d.curLang){ curLang=d.curLang; $("langsel").value=curLang; }
+  if(d.staffLang){ staffLang=d.staffLang; $("stafflangsel").value=staffLang; }
+  if(d.dark!==undefined && d.dark!==dark) toggleDark();
+  fixCommColors();
+  saveData();
+  renderAll();
+  if(typeof renderAdmin==="function") renderAdmin();
+  closeM("m-backup");
+  toast("Data importována ✓");
+}
+
+async function shareJSON(){
+  const data = getExportData();
+  const filename = "aro-data-"+new Date().toISOString().slice(0,10)+".json";
+  const blob = new Blob([data], {type:"application/json"});
+  const file = new File([blob], filename, {type:"application/json"});
+
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try {
+      await navigator.share({
+        title: "ARO Komunikátor — záloha dat",
+        text: "Data z aplikace ARO Komunikátor",
+        files: [file]
+      });
+    } catch(e){
+      if(e.name!=="AbortError") exportJSON(); // fallback to download
+    }
+  } else if(navigator.share){
+    // Share without file (older API)
+    const b64 = btoa(unescape(encodeURIComponent(data)));
+    const url = window.location.href.split("#")[0] + "#import=" + b64;
+    try {
+      await navigator.share({title:"ARO Komunikátor — data", url});
+    } catch(e){ exportJSON(); }
+  } else {
+    // No Web Share API — fallback to download
+    exportJSON();
+    toast("Sdílení není podporováno — data stažena jako soubor");
+  }
+}
+
+function importFromURL(){
+  const url = $("import-url-field").value.trim();
+  if(!url) return;
+  const hash = url.includes("#import=") ? url.split("#import=")[1] : null;
+  if(hash){
+    try {
+      const json = decodeURIComponent(escape(atob(hash)));
+      applyImport(JSON.parse(json));
+    } catch(e) {
+      toast("Nepodařilo se přečíst data z URL");
+    }
+  } else {
+    toast("URL neobsahuje importovatelná data");
+  }
+}
+
+// Check on load if URL contains import data
+function checkURLImport(){
+  const hash = window.location.hash;
+  if(hash && hash.startsWith("#import=")){
+    const b64 = hash.slice(8);
+    try {
+      const json = decodeURIComponent(escape(atob(b64)));
+      const d = JSON.parse(json);
+      // Show import prompt after short delay
+      setTimeout(()=>{
+        if(confirm("Tato stránka obsahuje sdílená data. Chcete je importovat?\n(Aktuální data budou přepsána)")){
+          applyImport(d);
+        }
+        // Clean URL
+        history.replaceState(null,"",window.location.pathname);
+      }, 800);
+    } catch(e) {}
+  }
+}
+
 loadData();
 fixCommColors();
-initLang();renderCats();renderCards();renderQ();
+initLang();
+checkURLImport();renderCats();renderCards();renderQ();
 
 
 // ════════════════════════════════════════════════════════════
